@@ -48,6 +48,8 @@ export async function invoicePdfRoutes(app: FastifyInstance) {
         serviceDate?: string;
         servicePeriodStart?: string;
         servicePeriodEnd?: string;
+        invoiceTemplate?: string;
+        invoiceAccentColor?: string;
       };
 
       // Construct mock objects matching what generateInvoicePdf expects
@@ -76,7 +78,7 @@ export async function invoicePdfRoutes(app: FastifyInstance) {
         addressCity: body.clientCity,
       };
 
-      const settingsData = {
+      const settingsData: Record<string, any> = {
         fullName: body.senderName,
         addressStreet: body.senderStreet,
         addressZip: body.senderZip,
@@ -87,6 +89,14 @@ export async function invoicePdfRoutes(app: FastifyInstance) {
         bic: body.senderBic,
         bankName: body.senderBank,
       };
+
+      // Merge optional template overrides for preview
+      if (body.invoiceTemplate) {
+        settingsData.invoiceTemplate = body.invoiceTemplate;
+      }
+      if (body.invoiceAccentColor) {
+        settingsData.invoiceAccentColor = body.invoiceAccentColor;
+      }
 
       const showVatNote = body.showVatNote !== false;
       const pdfBytes = await generateInvoicePdf(invoice, client, settingsData, {

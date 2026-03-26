@@ -26,6 +26,8 @@ export interface Settings {
   taxRate: number;
   taxId: string | null;
   vatId: string | null;
+  invoiceTemplate: string;
+  invoiceAccentColor: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -48,4 +50,6 @@ export interface SettingsUpdate {
   taxRate?: number;
   taxId?: string | null;
   vatId?: string | null;
+  invoiceTemplate?: string;
+  invoiceAccentColor?: string;
 }

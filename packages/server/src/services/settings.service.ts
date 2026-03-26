@@ -42,6 +42,8 @@ export async function updateSettings(
     taxRate: string;
     taxId: string | null;
     vatId: string | null;
+    invoiceTemplate: string;
+    invoiceAccentColor: string;
   }>,
 ) {
   const [updated] = await db

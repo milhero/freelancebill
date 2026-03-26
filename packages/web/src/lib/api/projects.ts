@@ -1,5 +1,5 @@
 import { fetchApi } from './client.js';
-import type { ApiResponse, ApiListResponse, Project, ProjectCreate, ProjectUpdate } from '@freelancebill/shared';
+import type { ApiResponse, ApiListResponse, Project, ProjectCreate, ProjectUpdate, ProjectStatsData } from '@freelancebill/shared';
 
 export async function getProjects(clientId?: string, status?: string) {
   return fetchApi<ApiListResponse<Project>>('/api/projects', {
@@ -27,4 +27,8 @@ export async function updateProject(id: string, data: ProjectUpdate) {
 
 export async function deleteProject(id: string) {
   return fetchApi(`/api/projects/${id}`, { method: 'DELETE' });
+}
+
+export async function getProjectStats(id: string) {
+  return fetchApi<ApiResponse<ProjectStatsData>>(`/api/projects/${id}/stats`);
 }

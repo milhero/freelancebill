@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { Type } from '@sinclair/typebox';
 import { getClients, getClient, createClient, updateClient, deleteClient } from '../services/client.service.js';
+import { getClientStats } from '../services/clientStats.service.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 
 const createClientSchema = {
@@ -33,6 +34,13 @@ export async function clientRoutes(app: FastifyInstance) {
   app.get('/api/clients', { preHandler: [requireAuth] }, async (request, reply) => {
     const { search } = request.query as { search?: string };
     const result = await getClients(request.userId, search);
+    return reply.send({ data: result });
+  });
+
+  app.get('/api/clients/:id/stats', { preHandler: [requireAuth] }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const userId = (request as any).userId;
+    const result = await getClientStats(userId, id);
     return reply.send({ data: result });
   });
 

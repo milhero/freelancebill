@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { Type } from '@sinclair/typebox';
 import { getProjects, getProject, createProject, updateProject, deleteProject } from '../services/project.service.js';
+import { getProjectStats } from '../services/projectStats.service.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 
 const createProjectSchema = {
@@ -29,6 +30,13 @@ export async function projectRoutes(app: FastifyInstance) {
   app.get('/api/projects', { preHandler: [requireAuth] }, async (request, reply) => {
     const { client_id, status } = request.query as { client_id?: string; status?: string };
     const result = await getProjects(request.userId, client_id, status);
+    return reply.send({ data: result });
+  });
+
+  app.get('/api/projects/:id/stats', { preHandler: [requireAuth] }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const userId = (request as any).userId;
+    const result = await getProjectStats(userId, id);
     return reply.send({ data: result });
   });
 

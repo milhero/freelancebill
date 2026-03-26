@@ -68,3 +68,43 @@ export interface MonthlyData {
   revenue: number;
   expenses: number;
 }
+
+export interface ClientStatsInvoice {
+  id: string;
+  invoiceNumber: string;
+  invoiceDate: string;
+  totalAmount: number;
+  status: string;
+  description: string | null;
+}
+
+export interface ClientStatsProject {
+  id: string;
+  name: string;
+  status: string;
+}
+
+export interface ClientMonthlyRevenue {
+  month: number;
+  revenue: number;
+}
+
+export interface ClientStatsData {
+  totalRevenue: number;
+  openInvoicesCount: number;
+  openInvoicesTotal: number;
+  paidInvoicesCount: number;
+  averageInvoiceAmount: number;
+  monthlyRevenue: ClientMonthlyRevenue[];
+  invoices: ClientStatsInvoice[];
+  projects: ClientStatsProject[];
+}
+
+export interface ProjectStatsData {
+  totalRevenue: number;
+  totalExpenses: number;
+  profitLoss: number;
+  invoiceCount: number;
+  invoices: ClientStatsInvoice[];
+  clientName: string | null;
+}

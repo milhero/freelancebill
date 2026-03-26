@@ -21,6 +21,8 @@ export const settings = pgTable('settings', {
   taxRate: numeric('tax_rate', { precision: 5, scale: 2 }).notNull().default('19.00'),
   taxId: varchar('tax_id', { length: 50 }),
   vatId: varchar('vat_id', { length: 50 }),
+  invoiceTemplate: varchar('invoice_template', { length: 30 }).notNull().default('standard'),
+  invoiceAccentColor: varchar('invoice_accent_color', { length: 7 }).notNull().default('#1a1a2e'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });
