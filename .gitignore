@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.svelte-kit/
+build/
+.env
+*.local
+.DS_Store
+uploads/
+*.log
