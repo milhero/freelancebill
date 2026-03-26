@@ -24,7 +24,17 @@
 
   onMount(async () => {
     const res = await getSettings();
-    settings = res.data;
+    // Normalize null values to empty strings for bind:value compatibility
+    const s = res.data;
+    s.phone = s.phone ?? '';
+    s.iban = s.iban ?? '';
+    s.bic = s.bic ?? '';
+    s.bankName = s.bankName ?? '';
+    s.taxId = s.taxId ?? '';
+    s.vatId = s.vatId ?? '';
+    s.taxMode = s.taxMode ?? 'kleinunternehmer';
+    s.taxRate = s.taxRate ?? 19;
+    settings = s;
   });
 
   async function handleSubmit(e: Event) {
