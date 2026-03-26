@@ -38,8 +38,6 @@
     isZoomed = scale !== 1;
     if (isZoomed) {
       showReset = true;
-      clearTimeout(resetTimeout);
-      resetTimeout = setTimeout(() => { if (!isZoomed) showReset = false; }, 3000);
     }
   });
 
@@ -90,10 +88,10 @@
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
+<div class="relative" onwheel={handleWheel}>
 <div
   bind:this={containerEl}
-  class="relative bg-white rounded-xl border border-gray-200 dark:bg-gray-100 dark:border-gray-200 overflow-hidden"
-  onwheel={handleWheel}
+  class="bg-white rounded-xl border border-gray-200 dark:bg-gray-100 dark:border-gray-200 overflow-hidden"
 >
   {#if pdfUrl}
     {#if loading}
@@ -123,19 +121,6 @@
       </div>
     </div>
 
-    <!-- Floating reset pill — only visible when zoomed or scrolled -->
-    {#if showReset}
-      <button
-        onclick={resetView}
-        class="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 pl-2 pr-2.5 py-1 rounded-full bg-gray-900/70 dark:bg-gray-800/80 backdrop-blur-sm text-white text-[11px] font-medium shadow-lg hover:bg-gray-900/90 transition-all duration-300 animate-fade-in"
-      >
-        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25"/>
-        </svg>
-        {Math.round(scale * 100)}%
-      </button>
-    {/if}
-
   {:else if loading}
     <div class="flex items-center justify-center" style="height: {pdfHeight || 700}px;">
       <div class="w-4 h-4 border-2 border-gray-200 border-t-indigo-500 rounded-full animate-spin"></div>
@@ -145,6 +130,20 @@
       <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
       <span class="text-xs">Formular ausfüllen für Vorschau</span>
     </div>
+  {/if}
+</div>
+
+  <!-- Floating reset pill — outside overflow-hidden -->
+  {#if showReset && pdfUrl}
+    <button
+      onclick={resetView}
+      class="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 pl-2 pr-2.5 py-1 rounded-full bg-gray-900/70 backdrop-blur-sm text-white text-[11px] font-medium shadow-lg hover:bg-gray-900/90 transition-all duration-200 animate-fade-in"
+    >
+      <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25"/>
+      </svg>
+      {Math.round(scale * 100)}%
+    </button>
   {/if}
 </div>
 
