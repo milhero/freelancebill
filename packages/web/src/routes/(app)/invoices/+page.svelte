@@ -169,15 +169,34 @@
                 {#if (invoice as any).status === 'cancelled'}
                   <Badge variant="gray"><span class="line-through">{t('invoices.cancelled')}</span></Badge>
                 {:else if invoice.status === 'paid'}
-                  <Badge variant="green">{t('invoices.paid')}</Badge>
+                  <Badge variant="green">✓ {t('invoices.paid')}</Badge>
                 {:else if (invoice as any).overdue}
-                  <Badge variant="red" onclick={() => openStatusModal(invoice)}>{t('invoices.overdue')} ({overdueDays(invoice)} {t('dashboard.daysOverdue')})</Badge>
+                  <Badge variant="red" onclick={() => openStatusModal(invoice)}>
+                    <span class="flex items-center gap-1">
+                      <span class="opacity-0 group-hover:opacity-100 transition-opacity">✓</span>
+                      {t('invoices.overdue')} ({overdueDays(invoice)} {t('dashboard.daysOverdue')})
+                    </span>
+                  </Badge>
                 {:else}
-                  <Badge variant="yellow" onclick={() => openStatusModal(invoice)}>{t('invoices.open')}</Badge>
+                  <Badge variant="yellow" onclick={() => openStatusModal(invoice)}>
+                    <span class="flex items-center gap-1">
+                      {t('invoices.open')}
+                    </span>
+                  </Badge>
                 {/if}
               </td>
               <td class="py-3 px-3">
                 <div class="flex items-center gap-2 justify-end">
+                  {#if invoice.status !== 'paid' && (invoice as any).status !== 'cancelled'}
+                    <button
+                      type="button"
+                      class="text-xs px-2 py-1 rounded bg-success-50 text-success-600 hover:bg-success-100 transition-colors font-medium"
+                      title="Als bezahlt markieren"
+                      onclick={() => openStatusModal(invoice)}
+                    >
+                      ✓ {t('invoices.paid')}
+                    </button>
+                  {/if}
                   {#if (invoice as any).overdue}
                     <button
                       type="button"
