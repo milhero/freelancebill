@@ -6,7 +6,7 @@ import {
   getInvoice,
   createInvoice,
   updateInvoice,
-  deleteInvoice,
+  cancelInvoice,
   updateInvoiceStatus,
 } from '../services/invoice.service.js';
 import { processRecurringInvoices } from '../services/recurring.service.js';
@@ -27,6 +27,9 @@ const CreateInvoiceSchema = Type.Object({
     Type.Union([Type.Literal('monthly'), Type.Literal('quarterly'), Type.Literal('yearly')]),
   ),
   notes: Type.Optional(Type.String()),
+  serviceDate: Type.Optional(Type.String()),
+  servicePeriodStart: Type.Optional(Type.String()),
+  servicePeriodEnd: Type.Optional(Type.String()),
 });
 
 const UpdateInvoiceSchema = Type.Partial(CreateInvoiceSchema);
@@ -110,15 +113,15 @@ export async function invoiceRoutes(app: FastifyInstance) {
     },
   );
 
-  // DELETE /api/invoices/:id
-  app.delete(
-    '/api/invoices/:id',
+  // POST /api/invoices/:id/cancel — Cancel (Stornieren) an invoice
+  app.post(
+    '/api/invoices/:id/cancel',
     { preHandler: [requireAuth] },
     async (request, reply) => {
       const { id } = request.params as { id: string };
       const userId = (request as any).userId;
-      await deleteInvoice(userId, id);
-      return reply.send({ data: { message: 'Deleted' } });
+      const result = await cancelInvoice(userId, id);
+      return reply.send({ data: result });
     },
   );
 

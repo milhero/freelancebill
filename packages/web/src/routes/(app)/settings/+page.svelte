@@ -194,6 +194,12 @@
     <Card>
       <h2 class="text-base font-semibold text-gray-900 mb-4">{t('settings.taxSettings')}</h2>
 
+      {#if !settings.taxId && !settings.vatId}
+        <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800 mb-4">
+          {t('settings.taxIdWarningBanner')}
+        </div>
+      {/if}
+
       <!-- Tax status badge -->
       {#if settings.taxMode === 'kleinunternehmer'}
         <div class="mb-4 inline-flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">

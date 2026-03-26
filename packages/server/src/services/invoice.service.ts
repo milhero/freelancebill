@@ -84,6 +84,9 @@ export async function getInvoices(
       notes: invoices.notes,
       reminderCount: invoices.reminderCount,
       lastReminderDate: invoices.lastReminderDate,
+      serviceDate: invoices.serviceDate,
+      servicePeriodStart: invoices.servicePeriodStart,
+      servicePeriodEnd: invoices.servicePeriodEnd,
       createdAt: invoices.createdAt,
       updatedAt: invoices.updatedAt,
       clientName: clients.name,
@@ -141,6 +144,9 @@ export async function getInvoice(userId: string, invoiceId: string) {
       notes: invoices.notes,
       reminderCount: invoices.reminderCount,
       lastReminderDate: invoices.lastReminderDate,
+      serviceDate: invoices.serviceDate,
+      servicePeriodStart: invoices.servicePeriodStart,
+      servicePeriodEnd: invoices.servicePeriodEnd,
       createdAt: invoices.createdAt,
       updatedAt: invoices.updatedAt,
       clientName: clients.name,
@@ -184,8 +190,26 @@ export async function createInvoice(
     isRecurring?: boolean;
     recurringInterval?: 'monthly' | 'quarterly' | 'yearly';
     notes?: string;
+    serviceDate?: string;
+    servicePeriodStart?: string;
+    servicePeriodEnd?: string;
   },
 ) {
+  // Validate client address (§14 UStG)
+  const [clientData] = await db
+    .select()
+    .from(clients)
+    .where(eq(clients.id, data.clientId))
+    .limit(1);
+
+  if (!clientData) {
+    throw new NotFoundError('Client not found');
+  }
+
+  if (!clientData.addressStreet || !clientData.addressZip || !clientData.addressCity) {
+    throw new ValidationError('Client address incomplete. Full address is required for invoices (§14 UStG).');
+  }
+
   const invoiceNumber = await generateInvoiceNumber();
   const invoiceDate = data.invoiceDate || new Date().toISOString().split('T')[0];
   const paymentDays = data.paymentDays ?? 14;
@@ -216,6 +240,9 @@ export async function createInvoice(
         ? calculateRecurringNextDate(invoiceDate, data.recurringInterval)
         : null,
       notes: data.notes || null,
+      serviceDate: data.serviceDate || null,
+      servicePeriodStart: data.servicePeriodStart || null,
+      servicePeriodEnd: data.servicePeriodEnd || null,
     })
     .returning();
 
@@ -266,6 +293,9 @@ export async function updateInvoice(
     isRecurring: boolean;
     recurringInterval: 'monthly' | 'quarterly' | 'yearly';
     notes: string;
+    serviceDate: string;
+    servicePeriodStart: string;
+    servicePeriodEnd: string;
   }>,
 ) {
   // Get existing invoice first
@@ -319,7 +349,7 @@ export async function updateInvoice(
   };
 }
 
-export async function deleteInvoice(userId: string, invoiceId: string) {
+export async function cancelInvoice(userId: string, invoiceId: string) {
   const [existing] = await db
     .select()
     .from(invoices)
@@ -330,15 +360,23 @@ export async function deleteInvoice(userId: string, invoiceId: string) {
     throw new NotFoundError('Invoice not found');
   }
 
-  if (existing.status !== 'open') {
-    throw new ValidationError('Only open invoices can be deleted');
+  if (existing.status === 'paid') {
+    throw new ValidationError('Paid invoices cannot be cancelled');
   }
 
-  await db
-    .delete(invoices)
-    .where(and(eq(invoices.id, invoiceId), eq(invoices.userId, userId)));
+  const [updated] = await db
+    .update(invoices)
+    .set({ status: 'cancelled', updatedAt: new Date() })
+    .where(and(eq(invoices.id, invoiceId), eq(invoices.userId, userId)))
+    .returning();
 
-  return { success: true };
+  return {
+    ...updated,
+    hours: updated.hours ? parseFloat(updated.hours as string) : null,
+    hourlyRate: updated.hourlyRate ? parseFloat(updated.hourlyRate as string) : null,
+    fixedAmount: updated.fixedAmount ? parseFloat(updated.fixedAmount as string) : null,
+    totalAmount: updated.totalAmount ? parseFloat(updated.totalAmount as string) : null,
+  };
 }
 
 export async function updateInvoiceStatus(

@@ -3,7 +3,7 @@ import { users } from './users.js';
 import { clients } from './clients.js';
 import { projects } from './projects.js';
 
-export const invoiceStatusEnum = pgEnum('invoice_status', ['open', 'paid', 'overdue']);
+export const invoiceStatusEnum = pgEnum('invoice_status', ['open', 'paid', 'overdue', 'cancelled']);
 export const billingTypeEnum = pgEnum('billing_type', ['hourly', 'fixed']);
 export const recurringIntervalEnum = pgEnum('recurring_interval', ['monthly', 'quarterly', 'yearly']);
 
@@ -31,6 +31,9 @@ export const invoices = pgTable('invoices', {
   notes: text('notes'),
   reminderCount: integer('reminder_count').default(0),
   lastReminderDate: varchar('last_reminder_date', { length: 10 }),
+  serviceDate: varchar('service_date', { length: 10 }),
+  servicePeriodStart: varchar('service_period_start', { length: 10 }),
+  servicePeriodEnd: varchar('service_period_end', { length: 10 }),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });

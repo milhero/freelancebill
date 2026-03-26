@@ -45,6 +45,9 @@ export async function invoicePdfRoutes(app: FastifyInstance) {
         taxRate?: number;
         taxId?: string | null;
         vatId?: string | null;
+        serviceDate?: string;
+        servicePeriodStart?: string;
+        servicePeriodEnd?: string;
       };
 
       // Construct mock objects matching what generateInvoicePdf expects
@@ -61,6 +64,9 @@ export async function invoicePdfRoutes(app: FastifyInstance) {
         totalAmount: body.totalAmount,
         notes: body.notes,
         paymentDays: body.paymentDays ?? 14,
+        serviceDate: body.serviceDate || null,
+        servicePeriodStart: body.servicePeriodStart || null,
+        servicePeriodEnd: body.servicePeriodEnd || null,
       };
 
       const client = {
