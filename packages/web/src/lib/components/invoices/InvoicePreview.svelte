@@ -59,7 +59,7 @@
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
-  class="group relative flex flex-col h-full min-h-[700px] rounded-2xl bg-gray-50 dark:bg-gray-100 overflow-hidden transition-colors"
+  class="group relative flex flex-col h-full min-h-[700px] rounded-2xl overflow-hidden transition-colors"
   onwheel={handleWheel}
 >
   {#if pdfUrl}
@@ -70,18 +70,13 @@
       </div>
     {/if}
 
-    <!-- PDF container -->
-    <div class="flex-1 overflow-auto flex justify-center items-start p-6 pt-8">
-      <div
-        class="relative bg-white rounded-sm transition-all duration-300 ease-out"
-        style="width: {zoom * 4.2}px; aspect-ratio: 210 / 297; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.08);"
-      >
-        <iframe
-          src="{pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH"
-          class="w-full h-full border-0 rounded-sm"
-          title="Invoice Preview"
-        ></iframe>
-      </div>
+    <!-- PDF container — fills entire area -->
+    <div class="flex-1 overflow-hidden">
+      <iframe
+        src="{pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH&zoom={zoom}"
+        class="w-full h-full border-0 bg-white"
+        title="Invoice Preview"
+      ></iframe>
     </div>
 
     <!-- Zoom controls — floating, only visible on hover -->
