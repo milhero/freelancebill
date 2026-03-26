@@ -13,7 +13,7 @@ export const settings = pgTable('settings', {
   iban: varchar('iban', { length: 50 }),
   bic: varchar('bic', { length: 20 }),
   bankName: varchar('bank_name', { length: 255 }),
-  taxFreeAllowance: numeric('tax_free_allowance', { precision: 10, scale: 2 }).notNull().default('11784.00'),
+  taxFreeAllowance: numeric('tax_free_allowance', { precision: 10, scale: 2 }).notNull().default('12348.00'),
   defaultPaymentDays: integer('default_payment_days').notNull().default(30),
   defaultHourlyRate: numeric('default_hourly_rate', { precision: 10, scale: 2 }).notNull().default('26.00'),
   language: varchar('language', { length: 5 }).notNull().default('de'),

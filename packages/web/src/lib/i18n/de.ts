@@ -235,7 +235,7 @@ export const de = {
     legalInvoiceTitle: '§14 UStG — Pflichtangaben auf Rechnungen',
     legalInvoiceItems: 'Name und Anschrift des Leistenden,Name und Anschrift des Leistungsempfängers,Steuernummer oder USt-IdNr.,Rechnungsdatum,Fortlaufende Rechnungsnummer,Leistungsbeschreibung,Leistungsdatum,Nettobetrag / Steuersatz / Steuerbetrag,Bruttobetrag',
     legalRetentionTitle: '§14b UStG — Aufbewahrungspflicht',
-    legalRetentionText: 'Rechnungen müssen 10 Jahre aufbewahrt werden.',
+    legalRetentionText: 'Rechnungen müssen 8 Jahre aufbewahrt werden (seit 2025 verkürzt durch das Bürokratieentlastungsgesetz IV).',
   },
   common: {
     loading: 'Laden...',
