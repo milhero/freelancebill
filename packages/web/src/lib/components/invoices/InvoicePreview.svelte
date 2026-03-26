@@ -61,11 +61,11 @@
       </div>
     {/if}
 
-    <div class="relative" style="height: {pdfHeight}px;">
+    <div class="relative overflow-hidden" style="height: {pdfHeight}px;">
       <iframe
         src="{pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitW"
-        class="absolute inset-[-1px] border-0 block"
-        style="width: calc(100% + 2px); height: calc(100% + 2px); background: white;"
+        class="absolute border-0 block"
+        style="top: -4px; left: -4px; width: calc(100% + 8px); height: calc(100% + 8px); background: white;"
         title="Invoice Preview"
       ></iframe>
     </div>
