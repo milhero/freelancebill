@@ -36,7 +36,7 @@
     if (!ready) return;
     const _data = JSON.stringify(formData);
     clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => generatePreview(), 800);
+    debounceTimer = setTimeout(() => generatePreview(), 500);
   });
 
   async function generatePreview() {
