@@ -1,0 +1,2 @@
+ALTER TABLE invoices ADD COLUMN IF NOT EXISTS reminder_count INTEGER DEFAULT 0;
+ALTER TABLE invoices ADD COLUMN IF NOT EXISTS last_reminder_date VARCHAR(10);

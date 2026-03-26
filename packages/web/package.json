@@ -1,0 +1,26 @@
+{
+  "name": "@freelancebill/web",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@freelancebill/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "@sveltejs/adapter-static": "^3.0.8",
+    "@sveltejs/kit": "^2.15.2",
+    "@sveltejs/vite-plugin-svelte": "^5.0.3",
+    "@tailwindcss/vite": "^4.0.12",
+    "sharp": "^0.34.5",
+    "svelte": "^5.19.0",
+    "tailwindcss": "^4.0.12",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.11"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "freelancebill",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -n server,web -c blue,green \"pnpm --filter @freelancebill/server dev\" \"pnpm --filter @freelancebill/web dev\"",
+    "build": "pnpm --filter @freelancebill/shared build && pnpm --filter @freelancebill/server build && pnpm --filter @freelancebill/web build",
+    "build:shared": "pnpm --filter @freelancebill/shared build",
+    "dev:server": "pnpm --filter @freelancebill/server dev",
+    "dev:web": "pnpm --filter @freelancebill/web dev",
+    "db:generate": "pnpm --filter @freelancebill/server db:generate",
+    "db:migrate": "pnpm --filter @freelancebill/server db:migrate",
+    "db:seed": "pnpm --filter @freelancebill/server db:seed"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "bcrypt",
+      "esbuild"
+    ]
+  }
+}
