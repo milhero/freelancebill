@@ -61,12 +61,14 @@
       </div>
     {/if}
 
-    <iframe
-      src="{pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitW"
-      class="w-full border-0 block"
-      style="height: {pdfHeight}px; background: white;"
-      title="Invoice Preview"
-    ></iframe>
+    <div class="relative" style="height: {pdfHeight}px;">
+      <iframe
+        src="{pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitW"
+        class="absolute inset-[-1px] border-0 block"
+        style="width: calc(100% + 2px); height: calc(100% + 2px); background: white;"
+        title="Invoice Preview"
+      ></iframe>
+    </div>
 
   {:else if loading}
     <div class="flex items-center justify-center" style="height: {pdfHeight || 700}px;">
