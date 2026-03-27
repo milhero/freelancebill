@@ -20,6 +20,9 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const { request } = event;
 
+  // Skip non-http(s) requests (e.g. chrome-extension://)
+  if (!request.url.startsWith('http')) return;
+
   // Network-first for API calls
   if (request.url.includes('/api/')) {
     event.respondWith(
