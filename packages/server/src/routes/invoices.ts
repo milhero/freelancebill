@@ -12,24 +12,24 @@ import {
 import { processRecurringInvoices } from '../services/recurring.service.js';
 
 const CreateInvoiceSchema = Type.Object({
-  clientId: Type.String(),
+  clientId: Type.String({ minLength: 1 }),
   projectId: Type.Optional(Type.String()),
-  invoiceDate: Type.Optional(Type.String()),
-  paymentDays: Type.Optional(Type.Number()),
-  description: Type.String(),
+  invoiceDate: Type.Optional(Type.String({ pattern: '^\\d{4}-\\d{2}-\\d{2}$' })),
+  paymentDays: Type.Optional(Type.Number({ minimum: 0, maximum: 365 })),
+  description: Type.String({ minLength: 1 }),
   projectSubtitle: Type.Optional(Type.String()),
   billingType: Type.Union([Type.Literal('hourly'), Type.Literal('fixed')]),
-  hours: Type.Optional(Type.Number()),
-  hourlyRate: Type.Optional(Type.Number()),
-  fixedAmount: Type.Optional(Type.Number()),
+  hours: Type.Optional(Type.Number({ minimum: 0 })),
+  hourlyRate: Type.Optional(Type.Number({ minimum: 0 })),
+  fixedAmount: Type.Optional(Type.Number({ minimum: 0 })),
   isRecurring: Type.Optional(Type.Boolean()),
   recurringInterval: Type.Optional(
     Type.Union([Type.Literal('monthly'), Type.Literal('quarterly'), Type.Literal('yearly')]),
   ),
   notes: Type.Optional(Type.String()),
-  serviceDate: Type.Optional(Type.String()),
-  servicePeriodStart: Type.Optional(Type.String()),
-  servicePeriodEnd: Type.Optional(Type.String()),
+  serviceDate: Type.Optional(Type.String({ pattern: '^\\d{4}-\\d{2}-\\d{2}$' })),
+  servicePeriodStart: Type.Optional(Type.String({ pattern: '^\\d{4}-\\d{2}-\\d{2}$' })),
+  servicePeriodEnd: Type.Optional(Type.String({ pattern: '^\\d{4}-\\d{2}-\\d{2}$' })),
 });
 
 const UpdateInvoiceSchema = Type.Partial(CreateInvoiceSchema);
@@ -92,8 +92,9 @@ export async function invoiceRoutes(app: FastifyInstance) {
   app.post(
     '/api/invoices/process-recurring',
     { preHandler: [requireAuth] },
-    async (_request, reply) => {
-      const results = await processRecurringInvoices();
+    async (request, reply) => {
+      const userId = (request as any).userId;
+      const results = await processRecurringInvoices(userId);
       return reply.send({ data: results, message: `${results.length} recurring invoice(s) processed` });
     },
   );

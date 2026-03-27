@@ -29,8 +29,8 @@ export interface ExpenseCreate {
   date: string;
   description: string;
   amount: number;
-  paymentMethod?: string;
-  notes?: string;
+  paymentMethod?: string | null;
+  notes?: string | null;
   tagIds?: string[];
 }
 

@@ -5,7 +5,7 @@ import archiver from 'archiver';
 import AdmZip from 'adm-zip';
 import { readFile, writeFile, mkdir } from 'fs/promises';
 import { existsSync } from 'fs';
-import { join } from 'path';
+import { join, resolve, basename } from 'path';
 
 export async function exportBackup(userId: string): Promise<Buffer> {
   // Query all tables
@@ -237,10 +237,18 @@ export async function importBackup(userId: string, zipBuffer: Buffer) {
     const uploadsMatch = name.match(/uploads\/(documents|receipts)\/(.+)$/);
     if (uploadsMatch && !entry.isDirectory) {
       const subDir = uploadsMatch[1]; // 'documents' or 'receipts'
-      const filename = uploadsMatch[2];
-      const targetDir = join(process.cwd(), 'uploads', subDir);
+      // Sanitize filename to prevent path traversal attacks
+      const filename = basename(uploadsMatch[2]);
+      if (filename.includes('..') || filename.includes('/') || filename.includes('\\')) {
+        continue; // Skip malicious filenames
+      }
+      const targetDir = resolve(process.cwd(), 'uploads', subDir);
       await mkdir(targetDir, { recursive: true });
-      const targetPath = join(targetDir, filename);
+      const targetPath = resolve(targetDir, filename);
+      // Verify the resolved path is still within the uploads directory
+      if (!targetPath.startsWith(targetDir)) {
+        continue; // Skip path traversal attempts
+      }
       await writeFile(targetPath, entry.getData());
       filesRestored++;
     }

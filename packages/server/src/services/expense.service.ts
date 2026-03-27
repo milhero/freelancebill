@@ -3,15 +3,7 @@ import { db } from '../db/index.js';
 import { expenses } from '../db/schema/expenses.js';
 import { tags, expenseTags } from '../db/schema/tags.js';
 import { NotFoundError } from '../utils/errors.js';
-
-type ExpenseCreate = {
-  date: string;
-  description: string;
-  amount: number;
-  paymentMethod?: string | null;
-  notes?: string | null;
-  tagIds?: string[];
-};
+import type { ExpenseCreate } from '@freelancebill/shared';
 
 function parseExpense(row: typeof expenses.$inferSelect) {
   return {

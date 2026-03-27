@@ -1,6 +1,7 @@
 type Theme = 'light' | 'dark' | 'system';
 
 let theme = $state<Theme>('light');
+let mediaQueryCleanup: (() => void) | null = null;
 
 export function getTheme(): Theme {
 	return theme;
@@ -20,11 +21,13 @@ export function initTheme() {
 		if (saved) theme = saved;
 	}
 	applyTheme();
-	// Listen for system preference changes
+	// Listen for system preference changes (clean up previous listener first)
 	if (typeof window !== 'undefined') {
-		window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-			if (theme === 'system') applyTheme();
-		});
+		if (mediaQueryCleanup) mediaQueryCleanup();
+		const mq = window.matchMedia('(prefers-color-scheme: dark)');
+		const handler = () => { if (theme === 'system') applyTheme(); };
+		mq.addEventListener('change', handler);
+		mediaQueryCleanup = () => mq.removeEventListener('change', handler);
 	}
 }
 

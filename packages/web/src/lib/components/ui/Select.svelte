@@ -15,7 +15,7 @@
     children,
     class: className = '',
     id,
-    value = $bindable(''),
+    value = $bindable(),
     ...rest
   }: Props = $props();
 
@@ -30,11 +30,13 @@
     id={selectId}
     class="block w-full rounded-lg border border-gray-200 bg-white dark:bg-gray-100 dark:border-gray-200 px-3.5 py-2.5 text-sm text-gray-900 transition-colors focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-500/20 {error ? 'border-danger-500' : ''} {className}"
     bind:value
+    aria-invalid={error ? 'true' : undefined}
+    aria-describedby={error ? `${selectId}-error` : undefined}
     {...rest}
   >
     {@render children()}
   </select>
   {#if error}
-    <p class="text-sm text-danger-600">{error}</p>
+    <p id="{selectId}-error" class="text-sm text-danger-600">{error}</p>
   {/if}
 </div>

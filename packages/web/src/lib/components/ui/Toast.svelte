@@ -11,14 +11,19 @@
 </script>
 
 {#if toasts.items.length > 0}
-  <div class="fixed bottom-6 right-6 z-50 flex flex-col gap-2">
+  <div class="fixed bottom-6 right-6 z-50 flex flex-col gap-2" role="region" aria-label="Notifications">
     {#each toasts.items as toast (toast.id)}
-      <div class="flex items-center gap-3 rounded-xl border px-4 py-3 text-sm font-medium shadow-lg {typeClasses[toast.type]}">
+      <div
+        class="flex items-center gap-3 rounded-xl border px-4 py-3 text-sm font-medium shadow-lg {typeClasses[toast.type]}"
+        role={toast.type === 'error' ? 'alert' : 'status'}
+        aria-live={toast.type === 'error' ? 'assertive' : 'polite'}
+      >
         <span>{toast.message}</span>
         <button
           type="button"
           class="ml-2 opacity-60 hover:opacity-100 transition-opacity"
           onclick={() => dismissToast(toast.id)}
+          aria-label="Close notification"
         >
           <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />

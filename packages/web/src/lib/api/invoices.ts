@@ -53,8 +53,12 @@ export async function createReminder(id: string): Promise<Blob> {
     headers: { 'Content-Type': 'application/json' },
   });
   if (!response.ok) {
-    const body = await response.json().catch(() => ({ error: 'Request failed' }));
-    throw new Error(body.error || `HTTP ${response.status}`);
+    const contentType = response.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      const body = await response.json().catch(() => ({ error: 'Request failed' }));
+      throw new Error(body.error || `HTTP ${response.status}`);
+    }
+    throw new Error(`HTTP ${response.status}`);
   }
   return response.blob();
 }

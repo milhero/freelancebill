@@ -1,4 +1,5 @@
-const CACHE_NAME = 'freelancebill-v1';
+const APP_VERSION = '2.0';
+const CACHE_NAME = `freelancebill-v${APP_VERSION}`;
 const STATIC_ASSETS = ['/', '/manifest.json'];
 
 self.addEventListener('install', (event) => {

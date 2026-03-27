@@ -7,6 +7,7 @@ import { NotFoundError, ValidationError } from '../utils/errors.js';
 import { generateInvoiceNumber } from './invoiceNumber.service.js';
 import { generateInvoicePdf } from './pdf.service.js';
 import { autoArchiveInvoice } from './document.service.js';
+import type { InvoiceCreate, InvoiceUpdate } from '@freelancebill/shared';
 
 function addDays(dateStr: string, days: number): string {
   const d = new Date(dateStr);
@@ -24,6 +25,10 @@ function calculateRecurringNextDate(invoiceDate: string, interval: string): stri
   return d.toISOString().split('T')[0];
 }
 
+function roundMoney(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
 function calculateTotal(data: {
   billingType: string;
   hours?: number | null;
@@ -33,9 +38,9 @@ function calculateTotal(data: {
   if (data.billingType === 'hourly') {
     const hours = data.hours ?? 0;
     const rate = data.hourlyRate ?? 0;
-    return hours * rate;
+    return roundMoney(hours * rate);
   }
-  return data.fixedAmount ?? 0;
+  return roundMoney(data.fixedAmount ?? 0);
 }
 
 export async function getInvoices(
@@ -53,7 +58,7 @@ export async function getInvoices(
   }
 
   if (filters?.status && filters.status !== 'overdue') {
-    conditions.push(eq(invoices.status, filters.status));
+    conditions.push(eq(invoices.status, filters.status as 'open' | 'paid' | 'cancelled'));
   }
 
   if (filters?.status === 'overdue') {
@@ -176,24 +181,7 @@ export async function getInvoice(userId: string, invoiceId: string) {
 
 export async function createInvoice(
   userId: string,
-  data: {
-    clientId: string;
-    projectId?: string;
-    invoiceDate?: string;
-    paymentDays?: number;
-    description: string;
-    projectSubtitle?: string;
-    billingType: 'hourly' | 'fixed';
-    hours?: number;
-    hourlyRate?: number;
-    fixedAmount?: number;
-    isRecurring?: boolean;
-    recurringInterval?: 'monthly' | 'quarterly' | 'yearly';
-    notes?: string;
-    serviceDate?: string;
-    servicePeriodStart?: string;
-    servicePeriodEnd?: string;
-  },
+  data: InvoiceCreate,
 ) {
   // Validate client address (§14 UStG)
   const [clientData] = await db
@@ -230,9 +218,9 @@ export async function createInvoice(
       description: data.description,
       projectSubtitle: data.projectSubtitle || null,
       billingType: data.billingType,
-      hours: data.hours ?? null,
-      hourlyRate: data.hourlyRate ?? null,
-      fixedAmount: data.fixedAmount ?? null,
+      hours: data.hours != null ? data.hours.toString() : null,
+      hourlyRate: data.hourlyRate != null ? data.hourlyRate.toString() : null,
+      fixedAmount: data.fixedAmount != null ? data.fixedAmount.toString() : null,
       totalAmount: totalAmount.toString(),
       isRecurring: data.isRecurring ?? false,
       recurringInterval: data.recurringInterval || null,
@@ -279,24 +267,7 @@ export async function createInvoice(
 export async function updateInvoice(
   userId: string,
   invoiceId: string,
-  data: Partial<{
-    clientId: string;
-    projectId: string;
-    invoiceDate: string;
-    paymentDays: number;
-    description: string;
-    projectSubtitle: string;
-    billingType: 'hourly' | 'fixed';
-    hours: number;
-    hourlyRate: number;
-    fixedAmount: number;
-    isRecurring: boolean;
-    recurringInterval: 'monthly' | 'quarterly' | 'yearly';
-    notes: string;
-    serviceDate: string;
-    servicePeriodStart: string;
-    servicePeriodEnd: string;
-  }>,
+  data: InvoiceUpdate,
 ) {
   // Get existing invoice first
   const [existing] = await db

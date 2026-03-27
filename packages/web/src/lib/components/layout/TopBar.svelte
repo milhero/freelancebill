@@ -1,5 +1,6 @@
 <script lang="ts">
   import { performLogout } from '$lib/stores/auth.svelte.js';
+  import { t } from '$lib/i18n/index.svelte.js';
 
   interface Props {
     onMenuToggle: () => void;
@@ -28,6 +29,6 @@
     class="text-sm text-gray-500 hover:text-gray-700 transition-colors"
     onclick={performLogout}
   >
-    Abmelden
+    {t('nav.logout')}
   </button>
 </header>

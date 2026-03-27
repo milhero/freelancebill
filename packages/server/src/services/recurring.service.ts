@@ -3,18 +3,24 @@ import { invoices } from '../db/schema/invoices.js';
 import { eq, and, lte, isNotNull } from 'drizzle-orm';
 import { generateInvoiceNumber } from './invoiceNumber.service.js';
 
-export async function processRecurringInvoices() {
+export async function processRecurringInvoices(userId?: string) {
   const today = new Date().toISOString().split('T')[0];
 
-  // Find all recurring invoices due for renewal
+  // Find recurring invoices due for renewal, scoped to user if provided
+  const conditions = [
+    eq(invoices.isRecurring, true),
+    isNotNull(invoices.recurringNextDate),
+    lte(invoices.recurringNextDate, today),
+  ];
+
+  if (userId) {
+    conditions.push(eq(invoices.userId, userId));
+  }
+
   const dueInvoices = await db
     .select()
     .from(invoices)
-    .where(and(
-      eq(invoices.isRecurring, true),
-      isNotNull(invoices.recurringNextDate),
-      lte(invoices.recurringNextDate, today),
-    ));
+    .where(and(...conditions));
 
   const results = [];
 
