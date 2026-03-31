@@ -1,0 +1,47 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: freelancebill
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-freelancebill_secret}
+      POSTGRES_DB: freelancebill
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U freelancebill"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  server:
+    build:
+      context: .
+      target: server
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://freelancebill:${DB_PASSWORD:-freelancebill_secret}@db:5432/freelancebill
+      SESSION_SECRET: ${SESSION_SECRET:-change-me-to-a-random-64-char-string-in-production}
+      NODE_ENV: production
+      PORT: "3000"
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost}
+      UPLOAD_DIR: ./uploads
+    volumes:
+      - uploads:/app/uploads
+
+  web:
+    build:
+      context: .
+      target: nginx
+    restart: unless-stopped
+    ports:
+      - "${PORT:-80}:80"
+    depends_on:
+      - server
+
+volumes:
+  postgres_data:
+  uploads:

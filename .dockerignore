@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.svelte-kit/
+build/
+.env
+*.local
+.DS_Store
+uploads/
+*.log
+.git/
+.gitignore
+.claude/
+docs/
+deploy/
+README.md
+LICENSE
