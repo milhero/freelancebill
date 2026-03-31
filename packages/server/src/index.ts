@@ -28,12 +28,17 @@ const app = Fastify({
       ? { target: 'pino-pretty', options: { translateTime: 'HH:MM:ss' } }
       : undefined,
   },
+  trustProxy: config.isProduction,
 });
 
-// Error handler
+// Error handler — never leak stack traces
 app.setErrorHandler((error, request, reply) => {
   if (error instanceof AppError) {
     return reply.status(error.statusCode).send({ error: error.message, statusCode: error.statusCode });
+  }
+  // Fastify validation errors
+  if (error instanceof Error && 'validation' in error) {
+    return reply.status(400).send({ error: 'Validation failed', statusCode: 400 });
   }
   request.log.error(error);
   return reply.status(500).send({ error: 'Internal Server Error', statusCode: 500 });
@@ -47,6 +52,10 @@ await app.register(fastifyStatic, {
   root: join(process.cwd(), 'uploads'),
   prefix: '/uploads/',
   decorateReply: false,
+  setHeaders: (res) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Content-Security-Policy', "default-src 'none'");
+  },
 });
 
 // Health check

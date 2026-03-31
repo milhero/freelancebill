@@ -228,21 +228,21 @@
     <h2 class="text-base font-semibold text-gray-900 mb-4">{t('dashboard.csvExport')}</h2>
     <div class="flex flex-wrap gap-3">
       <a
-        href="/api/exports/income?year=2026"
+        href={`/api/exports/income?year=${new Date().getFullYear()}`}
         download
         class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white dark:bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-50"
       >
         {t('dashboard.income')} CSV
       </a>
       <a
-        href="/api/exports/expenses?year=2026"
+        href={`/api/exports/expenses?year=${new Date().getFullYear()}`}
         download
         class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white dark:bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-50"
       >
         {t('dashboard.expenses')} CSV
       </a>
       <a
-        href="/api/exports/summary?year=2026"
+        href={`/api/exports/summary?year=${new Date().getFullYear()}`}
         download
         class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white dark:bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-50"
       >

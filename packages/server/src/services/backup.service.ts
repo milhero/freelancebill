@@ -116,9 +116,37 @@ export async function exportBackup(userId: string): Promise<Buffer> {
   });
 }
 
+// Field allowlists for restore — only these fields are inserted
+const SETTINGS_FIELDS = ['fullName', 'addressStreet', 'addressZip', 'addressCity', 'email', 'phone', 'iban', 'bic', 'bankName', 'taxFreeAllowance', 'defaultPaymentDays', 'defaultHourlyRate', 'language', 'taxMode', 'taxRate', 'taxId', 'vatId', 'invoiceTemplate', 'invoiceAccentColor'];
+const CLIENT_FIELDS = ['id', 'name', 'addressStreet', 'addressZip', 'addressCity', 'contactPerson', 'email', 'phone', 'notes', 'createdAt', 'updatedAt'];
+const PROJECT_FIELDS = ['id', 'clientId', 'name', 'status', 'startDate', 'endDate', 'notes', 'createdAt', 'updatedAt'];
+const INVOICE_FIELDS = ['id', 'clientId', 'projectId', 'invoiceNumber', 'invoiceDate', 'paymentDueDate', 'paymentDays', 'description', 'projectSubtitle', 'billingType', 'hours', 'hourlyRate', 'fixedAmount', 'totalAmount', 'status', 'paidDate', 'isRecurring', 'recurringInterval', 'recurringNextDate', 'notes', 'reminderCount', 'lastReminderDate', 'serviceDate', 'servicePeriodStart', 'servicePeriodEnd', 'createdAt', 'updatedAt'];
+const EXPENSE_FIELDS = ['id', 'date', 'description', 'amount', 'paymentMethod', 'receiptPath', 'notes', 'createdAt', 'updatedAt'];
+const TAG_FIELDS = ['id', 'name', 'color', 'createdAt'];
+const DOCUMENT_FIELDS = ['id', 'invoiceId', 'name', 'type', 'filePath', 'fileSize', 'mimeType', 'uploadedAt'];
+
+function pickFields(obj: Record<string, unknown>, fields: string[]): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
+  for (const field of fields) {
+    if (field in obj) result[field] = obj[field];
+  }
+  return result;
+}
+
+const MAX_UNCOMPRESSED_SIZE = 500 * 1024 * 1024; // 500MB max uncompressed
+
 export async function importBackup(userId: string, zipBuffer: Buffer) {
   const zip = new AdmZip(zipBuffer);
   const entries = zip.getEntries();
+
+  // ZIP bomb protection: check total uncompressed size
+  let totalUncompressedSize = 0;
+  for (const entry of entries) {
+    totalUncompressedSize += entry.header.size;
+    if (totalUncompressedSize > MAX_UNCOMPRESSED_SIZE) {
+      throw new Error('Backup too large: uncompressed size exceeds 500MB limit');
+    }
+  }
 
   // Find data.json (could be in a subfolder)
   const dataEntry = entries.find((e) => e.entryName.endsWith('/data.json') || e.entryName === 'data.json');
@@ -160,16 +188,16 @@ export async function importBackup(userId: string, zipBuffer: Buffer) {
       files: 0,
     };
 
-    // Settings
+    // Settings — use field allowlist to prevent arbitrary data injection
     if (data.settings) {
-      await tx.insert(settings).values({ ...data.settings, userId });
+      await tx.insert(settings).values({ ...pickFields(data.settings, SETTINGS_FIELDS), userId } as any);
       result.settings = 1;
     }
 
     // Clients
     if (data.clients?.length) {
       for (const client of data.clients) {
-        await tx.insert(clients).values({ ...client, userId });
+        await tx.insert(clients).values({ ...pickFields(client, CLIENT_FIELDS), userId } as any);
       }
       result.clients = data.clients.length;
     }
@@ -177,7 +205,7 @@ export async function importBackup(userId: string, zipBuffer: Buffer) {
     // Projects
     if (data.projects?.length) {
       for (const project of data.projects) {
-        await tx.insert(projects).values({ ...project, userId });
+        await tx.insert(projects).values({ ...pickFields(project, PROJECT_FIELDS), userId } as any);
       }
       result.projects = data.projects.length;
     }
@@ -185,7 +213,7 @@ export async function importBackup(userId: string, zipBuffer: Buffer) {
     // Invoices
     if (data.invoices?.length) {
       for (const invoice of data.invoices) {
-        await tx.insert(invoices).values({ ...invoice, userId });
+        await tx.insert(invoices).values({ ...pickFields(invoice, INVOICE_FIELDS), userId } as any);
       }
       result.invoices = data.invoices.length;
     }
@@ -193,7 +221,7 @@ export async function importBackup(userId: string, zipBuffer: Buffer) {
     // Expenses
     if (data.expenses?.length) {
       for (const expense of data.expenses) {
-        await tx.insert(expenses).values({ ...expense, userId });
+        await tx.insert(expenses).values({ ...pickFields(expense, EXPENSE_FIELDS), userId } as any);
       }
       result.expenses = data.expenses.length;
     }
@@ -201,14 +229,19 @@ export async function importBackup(userId: string, zipBuffer: Buffer) {
     // Tags
     if (data.tags?.length) {
       for (const tag of data.tags) {
-        await tx.insert(tags).values({ ...tag, userId });
+        await tx.insert(tags).values({ ...pickFields(tag, TAG_FIELDS), userId } as any);
       }
       result.tags = data.tags.length;
     }
 
-    // Expense-tag relations
+    // Expense-tag relations — validate IDs belong to restored data
     if (data.expenseTags?.length) {
+      const restoredExpenseIds = new Set((data.expenses || []).map((e: any) => e.id));
+      const restoredTagIds = new Set((data.tags || []).map((t: any) => t.id));
       for (const et of data.expenseTags) {
+        if (!restoredExpenseIds.has(et.expenseId) || !restoredTagIds.has(et.tagId)) {
+          continue; // Skip orphaned relations
+        }
         await tx.insert(expenseTags).values({
           id: et.id,
           expenseId: et.expenseId,
@@ -221,7 +254,7 @@ export async function importBackup(userId: string, zipBuffer: Buffer) {
     // Documents
     if (data.documents?.length) {
       for (const doc of data.documents) {
-        await tx.insert(documents).values({ ...doc, userId });
+        await tx.insert(documents).values({ ...pickFields(doc, DOCUMENT_FIELDS), userId } as any);
       }
       result.documents = data.documents.length;
     }

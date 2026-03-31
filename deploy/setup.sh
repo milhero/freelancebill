@@ -37,9 +37,16 @@ apt install -y nginx
 # Install Certbot
 apt install -y certbot python3-certbot-nginx
 
-# Create directories
+# Create app user for running the application (don't run as root)
+useradd -m -s /bin/bash freelancebill || true
+
+# Create directories with proper permissions
 mkdir -p /var/www/freelancebill
 mkdir -p /var/log/freelancebill
+chown -R freelancebill:freelancebill /var/www/freelancebill
+chown -R freelancebill:freelancebill /var/log/freelancebill
+chmod 750 /var/www/freelancebill
+chmod 750 /var/log/freelancebill
 
 echo ""
 echo "=== Setup complete ==="
@@ -48,8 +55,9 @@ echo "Next steps:"
 echo "1. Clone repo to /var/www/freelancebill"
 echo "2. cp deploy/nginx.conf /etc/nginx/sites-available/freelancebill"
 echo "3. ln -s /etc/nginx/sites-available/freelancebill /etc/nginx/sites-enabled/"
-echo "4. certbot --nginx -d finance.milanronnenberg.de"
-echo "5. Create .env in /var/www/freelancebill/packages/server/"
-echo "6. pnpm install && pnpm build"
-echo "7. pm2 start deploy/ecosystem.config.cjs"
-echo "8. pm2 save && pm2 startup"
+echo "4. Update server_name in nginx config to your domain"
+echo "5. certbot --nginx -d yourdomain.example.com"
+echo "6. Create .env in /var/www/freelancebill/packages/server/ (chmod 600)"
+echo "7. su - freelancebill -c 'cd /var/www/freelancebill && pnpm install && pnpm build'"
+echo "8. su - freelancebill -c 'pm2 start deploy/ecosystem.config.cjs'"
+echo "9. pm2 save && pm2 startup"

@@ -2,7 +2,7 @@ import type { FastifyInstance } from 'fastify';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { getDocuments, getDocument, createDocument, deleteDocument } from '../services/document.service.js';
 import { mkdir, writeFile } from 'fs/promises';
-import { join } from 'path';
+import { join, resolve } from 'path';
 import { randomUUID } from 'crypto';
 import { createReadStream } from 'fs';
 import { stat } from 'fs/promises';
@@ -41,7 +41,14 @@ export async function documentRoutes(app: FastifyInstance) {
     const name = fields.name?.value || data.filename;
     const type = fields.type?.value || 'other';
 
-    const ext = data.filename.split('.').pop() || 'bin';
+    // Derive extension from validated MIME type, not user-supplied filename
+    const mimeToExt: Record<string, string> = {
+      'image/jpeg': 'jpg',
+      'image/png': 'png',
+      'image/webp': 'webp',
+      'application/pdf': 'pdf',
+    };
+    const ext = mimeToExt[data.mimetype] || 'bin';
     const filename = `${randomUUID()}.${ext}`;
     const filepath = join(DOCUMENTS_DIR, filename);
 
@@ -68,7 +75,13 @@ export async function documentRoutes(app: FastifyInstance) {
 
     const doc = await getDocument(userId, id);
 
-    const filepath = join(process.cwd(), doc.filePath.replace(/^\//, ''));
+    const uploadsBase = resolve(process.cwd(), 'uploads');
+    const filepath = resolve(process.cwd(), doc.filePath.replace(/^\//, ''));
+
+    // Prevent path traversal — file must be within uploads directory
+    if (!filepath.startsWith(uploadsBase)) {
+      return reply.status(403).send({ error: 'Access denied' });
+    }
 
     try {
       const fileStat = await stat(filepath);
@@ -79,8 +92,11 @@ export async function documentRoutes(app: FastifyInstance) {
       return reply.status(404).send({ error: 'File not found' });
     }
 
+    // Sanitize filename for Content-Disposition header (RFC 5987)
+    const safeName = doc.name.replace(/["\\\n\r]/g, '_');
     reply.header('Content-Type', doc.mimeType || 'application/octet-stream');
-    reply.header('Content-Disposition', `inline; filename="${doc.name}"`);
+    reply.header('X-Content-Type-Options', 'nosniff');
+    reply.header('Content-Disposition', `inline; filename="${safeName}"; filename*=UTF-8''${encodeURIComponent(doc.name)}`);
 
     const stream = createReadStream(filepath);
     return reply.send(stream);

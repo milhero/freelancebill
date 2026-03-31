@@ -54,6 +54,10 @@ export async function getInvoices(
   }
 
   if (filters?.year) {
+    // Validate year is exactly 4 digits to prevent SQL wildcard injection
+    if (!/^\d{4}$/.test(filters.year)) {
+      throw new ValidationError('Year must be a 4-digit number');
+    }
     conditions.push(like(invoices.invoiceNumber, `${filters.year}-%`));
   }
 

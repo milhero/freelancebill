@@ -39,7 +39,14 @@ export async function uploadRoutes(app: FastifyInstance) {
       return reply.status(400).send({ error: 'Only JPEG, PNG, WebP and PDF allowed' });
     }
 
-    const ext = file.filename.split('.').pop() || 'bin';
+    // Derive extension from validated MIME type, not user-supplied filename
+    const mimeToExt: Record<string, string> = {
+      'image/jpeg': 'jpg',
+      'image/png': 'png',
+      'image/webp': 'webp',
+      'application/pdf': 'pdf',
+    };
+    const ext = mimeToExt[file.mimetype] || 'bin';
     const filename = `${randomUUID()}.${ext}`;
     const filepath = join(UPLOAD_DIR, filename);
 
