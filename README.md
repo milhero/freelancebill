@@ -2,167 +2,134 @@
 
 Self-hosted business tracker for German freelancers and small businesses.
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![License](https://img.shields.io/badge/license-CC%20BY--NC%204.0-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D20-green.svg)
+![PostgreSQL](https://img.shields.io/badge/postgresql-%3E%3D15-blue.svg)
 
 ## Features
 
-- **Dashboard** — KPIs, year comparison, top clients, aging report, monthly chart
-- **Invoices** — Create, manage, PDF generation (§14 UStG compliant), recurring invoices
+- **Dashboard** — KPIs, year comparison, top clients, aging report, monthly revenue chart
+- **Invoices** — Create, manage, PDF generation (8 templates), recurring invoices
+- **Legal Compliance** — §14 UStG compliant invoices, Kleinunternehmer (§19 UStG) or Regelbesteuerung
+- **Dunning System** — Zahlungserinnerung, Mahnung, Letzte Mahnung
 - **Quick Invoice** — One-off PDF invoices without database storage
-- **Dunning System** — Payment reminders (Zahlungserinnerung, Mahnung, Letzte Mahnung)
 - **Expenses** — Track with tags, payment methods, receipt uploads
-- **Clients & Projects** — Full CRM with revenue tracking
-- **Document Archive** — Auto-archive invoices, upload external documents
-- **CSV Export** — Income, expenses, summary reports
-- **Tax Compliance** — Kleinunternehmer (§19 UStG) or Regelbesteuerung, with legal notes
-- **Dark Mode** — Light, dark, and system preference
+- **Clients & Projects** — CRM with revenue tracking
+- **Document Archive** — Auto-archive invoices, upload external documents (§14b UStG)
+- **CSV Export** — Income, expenses, summary reports for tax filing
+- **Full Backup** — ZIP backup & restore (data + files)
+- **Dark Mode** — Light, dark, system preference
 - **i18n** — German and English
-- **PWA** — Installable on iPhone, iPad, Mac
-- **Data Backup** — Full JSON backup & restore
-
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Frontend | SvelteKit, Svelte 5, Tailwind CSS v4 |
-| Backend | Node.js, Fastify, TypeScript |
-| Database | PostgreSQL, Drizzle ORM |
-| PDF | pdf-lib |
-| Auth | JWT, bcrypt |
+- **PWA** — Installable on mobile and desktop
 
 ## Prerequisites
 
-- Node.js >= 20
-- pnpm >= 9
-- PostgreSQL >= 15
+- **Node.js** >= 20
+- **pnpm** >= 9
+- **PostgreSQL** >= 15
 
 ## Quick Start
 
-### 1. Clone & Install
-
 ```bash
+# 1. Clone & install
 git clone https://github.com/milhero/freelancebill.git
 cd freelancebill
 pnpm install
-```
 
-### 2. Database Setup
-
-```bash
+# 2. Database setup
 createdb freelancebill
-
 cp .env.example .env
-# Edit .env with your database credentials and a random JWT secret
-```
+# Edit .env — set DATABASE_URL and generate random secrets:
+#   openssl rand -hex 32    (for SESSION_SECRET)
 
-### 3. Run Migrations & Seed
-
-```bash
+# 3. Run migrations & seed demo data
 cd packages/server
+npx drizzle-kit push
 npx tsx src/db/seed.ts
+
+# 4. Start development
+cd ../..
+pnpm dev
 ```
 
-This creates all tables, a default user, and sample data.
+Open [http://localhost:5173](http://localhost:5173)
 
-### 4. Start Development
+**Default login:** `admin@example.com` / `changeme123`
+Change the password immediately after first login.
 
-```bash
-# Terminal 1: Backend
-cd packages/server
-npx tsx src/index.ts
+The seed creates demo data (clients, invoices, expenses) so you can explore the app right away.
 
-# Terminal 2: Frontend
-cd packages/web
-npx vite dev --port 5174
-```
+## Configuration
 
-Open [http://localhost:5174](http://localhost:5174)
-
-### Default Login
-
-```
-Email: kontakt@milanronnenberg.de
-Password: changeme123
-```
-
-> Change the password immediately after first login via Settings.
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `DATABASE_URL` | PostgreSQL connection string | `postgresql://freelancebill:password@localhost:5432/freelancebill` |
+| `SESSION_SECRET` | Session encryption key (min 32 chars in prod) | `dev-secret-change-in-production` |
+| `PORT` | Server port | `3000` |
+| `NODE_ENV` | Environment (`development` / `production`) | `development` |
+| `UPLOAD_DIR` | File upload directory | `./uploads` |
+| `CORS_ORIGIN` | Allowed frontend origin | `http://localhost:5173` |
 
 ## Project Structure
 
 ```
 freelancebill/
 ├── packages/
-│   ├── server/              # Fastify API server
+│   ├── server/          # Fastify REST API
 │   │   ├── src/
-│   │   │   ├── db/          # Schema, migrations, seed
-│   │   │   ├── routes/      # API endpoints
-│   │   │   ├── services/    # Business logic
-│   │   │   ├── middleware/  # Auth middleware
-│   │   │   └── utils/       # Helpers
-│   │   └── package.json
-│   └── web/                 # SvelteKit frontend
+│   │   │   ├── db/      # Schema, migrations, seed
+│   │   │   ├── routes/  # API endpoints
+│   │   │   ├── services/# Business logic + PDF generation
+│   │   │   └── middleware/
+│   │   └── uploads/     # Receipts & documents
+│   └── web/             # SvelteKit frontend
 │       ├── src/
-│       │   ├── lib/         # Components, API clients, i18n, stores
-│       │   ├── routes/      # Pages
-│       │   └── app.css      # Tailwind theme
-│       └── package.json
-├── shared/                  # Shared types, utils, constants
-├── deploy/                  # Nginx, PM2, setup script
-└── package.json             # Workspace root
+│       │   ├── lib/     # Components, API clients, i18n, stores
+│       │   └── routes/  # Pages
+│       └── static/      # PWA assets
+├── shared/              # Shared TypeScript types & utils
+└── deploy/              # Nginx, PM2, VPS setup script
 ```
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | SvelteKit, Svelte 5, Tailwind CSS v4 |
+| Backend | Node.js, Fastify 5, TypeScript |
+| Database | PostgreSQL, Drizzle ORM |
+| PDF | pdf-lib (8 invoice templates) |
+| Auth | Session-based (bcrypt + HttpOnly cookies) |
 
 ## Deployment
 
-Production deployment files are in `deploy/`:
+Production config in `deploy/`:
 
-- `nginx.conf` — Reverse proxy with SSL termination
-- `ecosystem.config.cjs` — PM2 process manager config
-- `setup.sh` — VPS provisioning script (Node.js, PostgreSQL, Nginx, Certbot)
+- `nginx.conf` — Reverse proxy with SSL, security headers, TLS 1.2+
+- `ecosystem.config.cjs` — PM2 config with user isolation
+- `setup.sh` — VPS provisioning (Node.js, PostgreSQL, Nginx, Certbot)
+
+Update `server_name` in `nginx.conf` to your domain before deploying.
 
 ```bash
-# On your VPS
 chmod +x deploy/setup.sh
 ./deploy/setup.sh
 ```
 
-## API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/login` | Login |
-| GET | `/api/auth/me` | Current user |
-| PUT | `/api/auth/password` | Change password |
-| GET/PUT | `/api/settings` | User settings |
-| GET/POST/PUT/DELETE | `/api/clients` | Client CRUD |
-| GET/POST/PUT/DELETE | `/api/projects` | Project CRUD |
-| GET/POST/PUT/DELETE | `/api/invoices` | Invoice CRUD |
-| POST | `/api/invoices/:id/status` | Update payment status |
-| GET | `/api/invoices/:id/pdf` | Download invoice PDF |
-| POST | `/api/invoices/:id/reminder` | Generate dunning letter |
-| POST | `/api/invoices/preview-pdf` | Live PDF preview |
-| POST | `/api/invoices/process-recurring` | Process recurring invoices |
-| GET/POST/PUT/DELETE | `/api/expenses` | Expense CRUD |
-| POST | `/api/expenses/:id/receipt` | Upload receipt |
-| GET/POST/PUT/DELETE | `/api/tags` | Tag CRUD |
-| GET/POST/DELETE | `/api/documents` | Document archive |
-| GET | `/api/dashboard` | Dashboard data |
-| GET | `/api/exports/:type` | CSV export (income/expenses/summary) |
-| GET | `/api/backup` | Download full backup |
-| POST | `/api/backup/restore` | Restore from backup |
-
 ## Legal Compliance (Germany)
 
 - Sequential invoice numbering (§14 Abs. 4 UStG)
-- All required invoice fields (§14 UStG)
-- Kleinunternehmerregelung support (§19 UStG)
-- Standard taxation (Regelbesteuerung) with configurable VAT rate
+- All required invoice fields per §14 UStG
+- Kleinunternehmerregelung (§19 UStG) with tax-free allowance tracking
+- Standard taxation with configurable VAT rate
 - Tax ID / VAT ID on invoices
-- Dunning letters (Zahlungserinnerung, Mahnung, Letzte Mahnung)
-- Document archiving (§14b UStG — 10 year retention)
+- Dunning letters (3 levels per German business practice)
+- Document archiving (§14b UStG)
 
 > This software is provided as-is. Consult a tax advisor for your specific situation.
 
 ## License
 
-[MIT](LICENSE) — Milan Ronnenberg, 2026
+[CC BY-NC 4.0](LICENSE) — Non-commercial use only. Attribution required.
+
+Copyright (c) 2026 Milan Ronnenberg
