@@ -5,7 +5,7 @@
       "name": "server",
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["--filter", "@freelancebill/server", "dev"],
-      "port": 3000
+      "port": 3001
     },
     {
       "name": "web",
