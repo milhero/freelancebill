@@ -9,13 +9,9 @@ Self-hosted business tracker for German freelancers and small businesses.
 ![Docker](https://img.shields.io/badge/docker-ready-blue.svg)
 ![Registry](https://img.shields.io/badge/registry-ghcr.io-blue.svg)
 
-<!-- Screenshots — replace with actual screenshots of your running instance -->
-<!-- ![Dashboard](docs/screenshots/dashboard.png) -->
-<!-- ![Invoice PDF](docs/screenshots/invoice.png) -->
-
 ## Why FreelanceBill?
 
-I built FreelanceBill because existing invoicing tools either cost a monthly fee, don't comply with German tax law, or require trusting a third party with your financial data. As a freelancer in Germany, I wanted a tool that runs on my own server, generates legally compliant invoices, and just works — without subscriptions or vendor lock-in.
+Existing invoicing tools either cost a monthly fee, don't comply with German tax law, or require trusting a third party with your financial data. FreelanceBill runs on your own server, generates legally compliant invoices, and just works — without subscriptions or vendor lock-in.
 
 ## Features
 
@@ -53,7 +49,7 @@ Open [http://localhost](http://localhost) — done.
 
 **Default login:** `admin@example.com` / `changeme123`
 
-Demo data (clients, invoices, expenses) is created automatically on first start.
+> **⚠️ Change the default password immediately after first login!**
 
 **Update to a new version:**
 ```bash
@@ -112,16 +108,15 @@ pnpm dev
 Open [http://localhost:5173](http://localhost:5173)
 
 **Default login:** `admin@example.com` / `changeme123`
-Change the password immediately after first login.
 
-The seed creates demo data (clients, invoices, expenses) so you can explore the app right away.
+> **⚠️ Change the default password immediately after first login!**
 
 ## Configuration
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `DATABASE_URL` | PostgreSQL connection string | `postgresql://freelancebill:password@localhost:5432/freelancebill` |
-| `SESSION_SECRET` | Session encryption key (min 32 chars in prod) | `dev-secret-change-in-production` |
+| `DATABASE_URL` | PostgreSQL connection string | — |
+| `SESSION_SECRET` | Session encryption key (min 32 chars in prod) | — (generate with `openssl rand -hex 32`) |
 | `PORT` | Server port | `3000` |
 | `NODE_ENV` | Environment (`development` / `production`) | `development` |
 | `UPLOAD_DIR` | File upload directory | `./uploads` |
