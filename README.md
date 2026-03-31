@@ -5,6 +5,15 @@ Self-hosted business tracker for German freelancers and small businesses.
 ![License](https://img.shields.io/badge/license-CC%20BY--NC%204.0-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D20-green.svg)
 ![PostgreSQL](https://img.shields.io/badge/postgresql-%3E%3D15-blue.svg)
+![Docker](https://img.shields.io/badge/docker-ready-blue.svg)
+
+<!-- Screenshots — replace with actual screenshots of your running instance -->
+<!-- ![Dashboard](docs/screenshots/dashboard.png) -->
+<!-- ![Invoice PDF](docs/screenshots/invoice.png) -->
+
+## Why FreelanceBill?
+
+I built FreelanceBill because existing invoicing tools either cost a monthly fee, don't comply with German tax law, or require trusting a third party with your financial data. As a freelancer in Germany, I wanted a tool that runs on my own server, generates legally compliant invoices, and just works — without subscriptions or vendor lock-in.
 
 ## Features
 
