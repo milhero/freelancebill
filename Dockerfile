@@ -34,8 +34,8 @@ COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
 COPY shared/package.json shared/
 COPY packages/server/package.json packages/server/
 
-# Install production dependencies only
-RUN pnpm install --frozen-lockfile --prod
+# Install all dependencies (including tsx + drizzle-kit needed for migrations/seed)
+RUN pnpm install --frozen-lockfile
 
 # Copy built server
 COPY --from=build /app/packages/server/dist/ packages/server/dist/
@@ -49,9 +49,6 @@ COPY packages/server/src/db/schema/ packages/server/src/db/schema/
 COPY packages/server/src/utils/password.ts packages/server/src/utils/password.ts
 COPY packages/server/drizzle.config.ts packages/server/drizzle.config.ts
 COPY packages/server/tsconfig.json packages/server/tsconfig.json
-
-# Install tsx and drizzle-kit for migrations/seed (not in prod deps)
-RUN pnpm add -w tsx drizzle-kit
 
 # Create uploads directory
 RUN mkdir -p /app/uploads/receipts /app/uploads/documents
