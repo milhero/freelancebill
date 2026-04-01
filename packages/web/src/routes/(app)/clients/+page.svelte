@@ -67,22 +67,18 @@
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
     {#each clients as client (client.id)}
       <a href="/clients/{client.id}" class="block hover:shadow-md transition-shadow rounded-xl">
-        <Card>
+        <Card class="h-full">
           <div class="flex items-start justify-between">
-            <div>
+            <div class="min-w-0">
               <span class="text-base font-medium text-gray-900">
                 {client.name}
               </span>
-              {#if client.addressCity}
-                <p class="mt-1 text-sm text-gray-500">{client.addressZip} {client.addressCity}</p>
-              {/if}
-              {#if client.email}
-                <p class="mt-0.5 text-sm text-gray-400">{client.email}</p>
-              {/if}
+              <p class="mt-1 text-sm text-gray-500">{client.addressZip || ''} {client.addressCity || ''}</p>
+              <p class="mt-0.5 text-sm text-gray-400 truncate">{client.email || '\u00A0'}</p>
             </div>
             <button
               type="button"
-              class="text-gray-300 hover:text-danger-500 transition-colors"
+              class="text-gray-300 hover:text-danger-500 transition-colors shrink-0"
               onclick={(e) => { e.preventDefault(); e.stopPropagation(); deleteTarget = client; }}
             >
               <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
