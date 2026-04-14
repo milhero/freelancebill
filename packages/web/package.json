@@ -9,7 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@freelancebill/shared": "workspace:*"
+    "@freelancebill/shared": "workspace:*",
+    "pdfjs-dist": "^5.5.207"
   },
   "devDependencies": {
     "@resvg/resvg-js": "^2.6.2",
