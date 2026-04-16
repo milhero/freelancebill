@@ -22,6 +22,22 @@
   let passwordError = $state('');
   let legalNotesOpen = $state(false);
 
+  const templates = [
+    { key: 'standard', name: 'Standard', desc: 'Minimales Design mit dunklem Header' },
+    { key: 'modern-minimal', name: 'Modern Minimal', desc: 'Viel Weissraum, perfekt fuer Kreative' },
+    { key: 'serios-klassisch', name: 'Serios Klassisch', desc: 'Traditionelles Geschaeftsbriefformat' },
+    { key: 'freelancer-kompakt', name: 'Freelancer Kompakt', desc: 'Kompakt, alles auf einen Blick' },
+    { key: 'agentur', name: 'Agentur', desc: 'Zweispaltig mit Akzentleiste' },
+    { key: 'handwerk', name: 'Handwerk', desc: 'Positionsnummern, Material & Arbeit' },
+    { key: 'beratung', name: 'Beratung', desc: 'Stundenbasiert mit Datumsansicht' },
+    { key: 'dienstleistung', name: 'Dienstleistung', desc: 'Klare Tabellenstruktur fuer Services' },
+  ];
+
+  const colorPalette = [
+    '#1a1a2e', '#2563eb', '#7c3aed', '#059669', '#dc2626',
+    '#d97706', '#0891b2', '#475569', '#000000', '#374151',
+  ];
+
   onMount(async () => {
     const res = await getSettings();
     // Normalize null values to empty strings for bind:value compatibility
@@ -34,6 +50,8 @@
     s.vatId = s.vatId ?? '';
     s.taxMode = s.taxMode ?? 'kleinunternehmer';
     s.taxRate = s.taxRate ?? 19;
+    s.invoiceTemplate = s.invoiceTemplate ?? 'standard';
+    s.invoiceAccentColor = s.invoiceAccentColor ?? '#1a1a2e';
     settings = s;
   });
 
@@ -59,6 +77,8 @@
         taxRate: settings.taxRate,
         taxId: settings.taxId,
         vatId: settings.vatId,
+        invoiceTemplate: settings.invoiceTemplate,
+        invoiceAccentColor: settings.invoiceAccentColor,
       });
       settings = res.data;
       showToast(t('common.success'), 'success');
@@ -320,6 +340,142 @@
         >
           {t('settings.themeSystem')}
         </button>
+      </div>
+    </Card>
+
+    <!-- Invoice Design -->
+    <Card>
+      <h2 class="text-base font-semibold text-gray-900 mb-4">{t('settings.invoiceDesign')}</h2>
+
+      <label class="text-sm font-medium text-gray-700 mb-2 block">{t('settings.invoiceTemplate')}</label>
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {#each templates as tmpl}
+          <button
+            type="button"
+            class="p-3 rounded-xl border-2 transition-all text-left {settings.invoiceTemplate === tmpl.key ? 'border-accent-500 ring-2 ring-accent-500/20' : 'border-gray-200 hover:border-gray-300'}"
+            onclick={() => { settings!.invoiceTemplate = tmpl.key; }}
+          >
+            <div class="h-15 bg-gray-50 rounded mb-2 flex items-center justify-center overflow-hidden">
+              {#if tmpl.key === 'standard'}
+                <!-- Dark top bar + line + table -->
+                <div class="w-full h-full flex flex-col p-1">
+                  <div class="h-2.5 rounded-sm mb-1" style="background-color: {settings.invoiceAccentColor}"></div>
+                  <div class="h-px bg-gray-300 mb-1"></div>
+                  <div class="flex-1 flex flex-col gap-0.5">
+                    <div class="h-1 bg-gray-200 rounded-sm w-full"></div>
+                    <div class="h-1 bg-gray-200 rounded-sm w-full"></div>
+                    <div class="h-1 bg-gray-200 rounded-sm w-3/4"></div>
+                  </div>
+                </div>
+              {:else if tmpl.key === 'modern-minimal'}
+                <!-- Thin lines + whitespace -->
+                <div class="w-full h-full flex flex-col justify-between p-2">
+                  <div class="h-px bg-gray-300"></div>
+                  <div class="h-px bg-gray-200"></div>
+                  <div class="h-px bg-gray-300"></div>
+                </div>
+              {:else if tmpl.key === 'serios-klassisch'}
+                <!-- Fold marks left + text blocks -->
+                <div class="w-full h-full flex p-1">
+                  <div class="w-0.5 h-full flex flex-col justify-around mr-1.5">
+                    <div class="w-0.5 h-1 bg-gray-400"></div>
+                    <div class="w-0.5 h-1 bg-gray-400"></div>
+                  </div>
+                  <div class="flex-1 flex flex-col gap-1 pt-1">
+                    <div class="h-1.5 bg-gray-200 rounded-sm w-2/3"></div>
+                    <div class="h-1 bg-gray-200 rounded-sm w-full"></div>
+                    <div class="h-1 bg-gray-200 rounded-sm w-full"></div>
+                    <div class="h-1 bg-gray-200 rounded-sm w-1/2"></div>
+                  </div>
+                </div>
+              {:else if tmpl.key === 'freelancer-kompakt'}
+                <!-- Thin accent top line + dense blocks -->
+                <div class="w-full h-full flex flex-col p-1">
+                  <div class="h-0.5 rounded-full mb-1" style="background-color: {settings.invoiceAccentColor}"></div>
+                  <div class="flex-1 flex flex-col gap-0.5">
+                    <div class="h-1 bg-gray-300 rounded-sm w-full"></div>
+                    <div class="h-1 bg-gray-200 rounded-sm w-full"></div>
+                    <div class="h-1 bg-gray-300 rounded-sm w-full"></div>
+                    <div class="h-1 bg-gray-200 rounded-sm w-full"></div>
+                    <div class="h-1 bg-gray-300 rounded-sm w-2/3"></div>
+                  </div>
+                </div>
+              {:else if tmpl.key === 'agentur'}
+                <!-- Accent sidebar left + content right -->
+                <div class="w-full h-full flex p-1">
+                  <div class="w-1.5 h-full rounded-sm mr-1.5" style="background-color: {settings.invoiceAccentColor}"></div>
+                  <div class="flex-1 flex flex-col gap-0.5 pt-0.5">
+                    <div class="h-1.5 bg-gray-200 rounded-sm w-2/3"></div>
+                    <div class="h-1 bg-gray-200 rounded-sm w-full"></div>
+                    <div class="h-1 bg-gray-200 rounded-sm w-full"></div>
+                    <div class="h-1 bg-gray-200 rounded-sm w-3/4"></div>
+                  </div>
+                </div>
+              {:else if tmpl.key === 'handwerk'}
+                <!-- Bold header bar + numbered rows -->
+                <div class="w-full h-full flex flex-col p-1">
+                  <div class="h-2 rounded-sm mb-1" style="background-color: {settings.invoiceAccentColor}"></div>
+                  <div class="flex-1 flex flex-col gap-0.5">
+                    {#each [1, 2, 3] as _}
+                      <div class="flex gap-0.5">
+                        <div class="w-2 h-1 rounded-sm" style="background-color: {settings.invoiceAccentColor}; opacity: 0.3"></div>
+                        <div class="flex-1 h-1 bg-gray-200 rounded-sm"></div>
+                      </div>
+                    {/each}
+                  </div>
+                </div>
+              {:else if tmpl.key === 'beratung'}
+                <!-- Small header + wide table -->
+                <div class="w-full h-full flex flex-col p-1">
+                  <div class="h-1 bg-gray-300 rounded-sm w-1/3 mb-1"></div>
+                  <div class="flex-1 border border-gray-200 rounded-sm flex flex-col">
+                    <div class="h-1.5 bg-gray-100 border-b border-gray-200"></div>
+                    <div class="flex-1 flex flex-col gap-0.5 p-0.5">
+                      <div class="h-1 bg-gray-200 rounded-sm w-full"></div>
+                      <div class="h-1 bg-gray-200 rounded-sm w-full"></div>
+                    </div>
+                  </div>
+                </div>
+              {:else if tmpl.key === 'dienstleistung'}
+                <!-- Colored header row + alternating rows -->
+                <div class="w-full h-full flex flex-col p-1">
+                  <div class="h-1.5 rounded-sm mb-0.5" style="background-color: {settings.invoiceAccentColor}; opacity: 0.8"></div>
+                  <div class="flex-1 flex flex-col gap-0.5">
+                    <div class="h-1 bg-gray-100 rounded-sm w-full"></div>
+                    <div class="h-1 bg-gray-200 rounded-sm w-full"></div>
+                    <div class="h-1 bg-gray-100 rounded-sm w-full"></div>
+                    <div class="h-1 bg-gray-200 rounded-sm w-full"></div>
+                  </div>
+                </div>
+              {/if}
+            </div>
+            <div class="text-sm font-medium text-gray-900">{tmpl.name}</div>
+            <div class="text-xs text-gray-500">{tmpl.desc}</div>
+          </button>
+        {/each}
+      </div>
+
+      <div class="mt-4">
+        <label class="text-sm font-medium text-gray-700 mb-2 block">{t('settings.invoiceAccentColor')}</label>
+        <div class="flex items-center gap-2 flex-wrap">
+          {#each colorPalette as color}
+            <button
+              type="button"
+              class="w-8 h-8 rounded-full border-2 transition-all {settings.invoiceAccentColor === color ? 'border-gray-900 ring-2 ring-gray-900/20 scale-110' : 'border-gray-200 hover:scale-105'}"
+              style="background-color: {color}"
+              onclick={() => { settings!.invoiceAccentColor = color; }}
+            />
+          {/each}
+          <!-- Custom picker -->
+          <label class="w-8 h-8 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer hover:border-gray-400 transition-colors relative overflow-hidden">
+            <span class="text-gray-400 text-xs">+</span>
+            <input
+              type="color"
+              class="absolute inset-0 opacity-0 cursor-pointer"
+              bind:value={settings.invoiceAccentColor}
+            />
+          </label>
+        </div>
       </div>
     </Card>
 

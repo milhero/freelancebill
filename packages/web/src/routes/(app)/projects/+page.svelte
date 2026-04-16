@@ -49,29 +49,31 @@
 {:else}
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
     {#each projects as project (project.id)}
-      <Card>
-        <div class="flex items-start justify-between">
-          <div>
-            <a href="/projects/{project.id}" class="text-base font-medium text-gray-900 hover:text-accent-600 transition-colors">
-              {project.name}
-            </a>
-            <div class="mt-2">
-              <Badge variant={project.status === 'active' ? 'green' : 'gray'}>
-                {project.status === 'active' ? t('projects.active') : t('projects.completed')}
-              </Badge>
+      <a href="/projects/{project.id}" class="block hover:shadow-md transition-shadow rounded-xl">
+        <Card>
+          <div class="flex items-start justify-between">
+            <div>
+              <span class="text-base font-medium text-gray-900">
+                {project.name}
+              </span>
+              <div class="mt-2">
+                <Badge variant={project.status === 'active' ? 'green' : 'gray'}>
+                  {project.status === 'active' ? t('projects.active') : t('projects.completed')}
+                </Badge>
+              </div>
             </div>
+            <button
+              type="button"
+              class="text-gray-300 hover:text-danger-500 transition-colors"
+              onclick={(e) => { e.preventDefault(); e.stopPropagation(); deleteTarget = project; }}
+            >
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
           </div>
-          <button
-            type="button"
-            class="text-gray-300 hover:text-danger-500 transition-colors"
-            onclick={() => (deleteTarget = project)}
-          >
-            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-          </button>
-        </div>
-      </Card>
+        </Card>
+      </a>
     {/each}
   </div>
 {/if}

@@ -22,6 +22,8 @@ const updateSettingsSchema = {
     taxRate: Type.Optional(Type.String()),
     taxId: Type.Optional(Type.Union([Type.String(), Type.Null()])),
     vatId: Type.Optional(Type.Union([Type.String(), Type.Null()])),
+    invoiceTemplate: Type.Optional(Type.String()),
+    invoiceAccentColor: Type.Optional(Type.String()),
   }),
 };
 

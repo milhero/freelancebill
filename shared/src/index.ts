@@ -4,7 +4,7 @@ export type { Client, ClientCreate, ClientUpdate } from './types/client.js';
 export type { Project, ProjectCreate, ProjectUpdate, ProjectStatus } from './types/project.js';
 export type { Invoice, InvoiceCreate, InvoiceUpdate, InvoiceStatusChange, InvoiceStatus, BillingType, RecurringInterval } from './types/invoice.js';
 export type { Expense, ExpenseCreate, ExpenseUpdate, Tag, TagCreate } from './types/expense.js';
-export type { ApiResponse, ApiListResponse, ApiError, DashboardData, OverdueInvoice, MonthlyData } from './types/api.js';
+export type { ApiResponse, ApiListResponse, ApiError, DashboardData, OverdueInvoice, MonthlyData, ClientStatsData, ProjectStatsData } from './types/api.js';
 
 // Constants
 export { INVOICE_STATUS, BILLING_TYPE, RECURRING_INTERVAL } from './constants/invoice.js';
