@@ -1,4 +1,4 @@
-export type InvoiceStatus = 'open' | 'paid' | 'overdue';
+export type InvoiceStatus = 'open' | 'paid' | 'overdue' | 'cancelled';
 export type BillingType = 'hourly' | 'fixed';
 export type RecurringInterval = 'monthly' | 'quarterly' | 'yearly';
 
@@ -26,6 +26,9 @@ export interface Invoice {
   notes: string | null;
   reminderCount: number;
   lastReminderDate: string | null;
+  serviceDate: string | null;
+  servicePeriodStart: string | null;
+  servicePeriodEnd: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -44,6 +47,9 @@ export interface InvoiceCreate {
   isRecurring?: boolean;
   recurringInterval?: RecurringInterval;
   notes?: string;
+  serviceDate?: string;
+  servicePeriodStart?: string;
+  servicePeriodEnd?: string;
 }
 
 export type InvoiceUpdate = Partial<InvoiceCreate>;

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { getInvoices, deleteInvoice, createReminder } from '$lib/api/invoices.js';
+  import { getInvoices, cancelInvoice, createReminder } from '$lib/api/invoices.js';
   import type { Invoice } from '@freelancebill/shared';
   import { formatDate, formatCurrency, daysBetween } from '@freelancebill/shared';
   import { t } from '$lib/i18n/index.svelte.js';
@@ -14,8 +14,8 @@
   import { showToast } from '$lib/stores/toast.svelte.js';
 
   let invoices = $state<Invoice[]>([]);
-  let filter = $state<'all' | 'open' | 'paid' | 'overdue'>('all');
-  let deleteTarget = $state<Invoice | null>(null);
+  let filter = $state<'all' | 'open' | 'paid' | 'overdue' | 'cancelled'>('all');
+  let cancelTarget = $state<Invoice | null>(null);
   let statusModalOpen = $state(false);
   let statusModalInvoiceId = $state('');
 
@@ -26,7 +26,9 @@
         ? invoices.filter((inv: any) => inv.overdue)
         : filter === 'open'
           ? invoices.filter((inv: any) => inv.status === 'open' && !inv.overdue)
-          : invoices.filter((inv) => inv.status === filter)
+          : filter === 'cancelled'
+            ? invoices.filter((inv: any) => inv.status === 'cancelled')
+            : invoices.filter((inv) => inv.status === filter)
   );
 
   onMount(loadInvoices);
@@ -36,12 +38,12 @@
     invoices = res.data;
   }
 
-  async function handleDelete() {
-    if (!deleteTarget) return;
+  async function handleCancel() {
+    if (!cancelTarget) return;
     try {
-      await deleteInvoice(deleteTarget.id);
-      showToast(t('invoices.delete'), 'success');
-      deleteTarget = null;
+      await cancelInvoice(cancelTarget.id);
+      showToast(t('invoices.cancelledSuccess'), 'success');
+      cancelTarget = null;
       await loadInvoices();
     } catch {
       showToast(t('common.error'), 'error');
@@ -123,6 +125,13 @@
   >
     {t('invoices.overdue')}
   </button>
+  <button
+    type="button"
+    class="px-3 py-1.5 text-sm rounded-lg font-medium transition-colors {filter === 'cancelled' ? 'bg-gray-200 text-gray-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}"
+    onclick={() => (filter = 'cancelled')}
+  >
+    {t('invoices.cancelled')}
+  </button>
 </div>
 
 {#if filteredInvoices.length === 0}
@@ -157,7 +166,9 @@
               <td class="py-3 px-3 text-gray-700">{invoice.description}</td>
               <td class="py-3 px-3 text-right font-medium text-gray-900">{formatCurrency(invoice.totalAmount)}</td>
               <td class="py-3 px-3">
-                {#if invoice.status === 'paid'}
+                {#if (invoice as any).status === 'cancelled'}
+                  <Badge variant="gray"><span class="line-through">{t('invoices.cancelled')}</span></Badge>
+                {:else if invoice.status === 'paid'}
                   <Badge variant="green">{t('invoices.paid')}</Badge>
                 {:else if (invoice as any).overdue}
                   <Badge variant="red" onclick={() => openStatusModal(invoice)}>{t('invoices.overdue')} ({overdueDays(invoice)} {t('dashboard.daysOverdue')})</Badge>
@@ -182,16 +193,14 @@
                       {/if}
                     </button>
                   {/if}
-                  {#if invoice.status !== 'paid'}
+                  {#if invoice.status !== 'paid' && (invoice as any).status !== 'cancelled'}
                     <button
                       type="button"
-                      class="text-gray-300 hover:text-danger-500 transition-colors"
-                      aria-label={t('common.delete')}
-                      onclick={() => (deleteTarget = invoice)}
+                      class="text-xs px-2 py-1 rounded bg-gray-50 text-gray-500 hover:bg-danger-50 hover:text-danger-600 transition-colors font-medium"
+                      aria-label={t('invoices.cancelInvoice')}
+                      onclick={() => (cancelTarget = invoice)}
                     >
-                      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
+                      {t('invoices.cancelInvoice')}
                     </button>
                   {/if}
                 </div>
@@ -205,11 +214,11 @@
 {/if}
 
 <ConfirmDialog
-  open={deleteTarget !== null}
-  title={t('invoices.delete')}
-  message={t('invoices.confirmDelete')}
-  onconfirm={handleDelete}
-  oncancel={() => (deleteTarget = null)}
+  open={cancelTarget !== null}
+  title={t('invoices.cancelInvoice')}
+  message={t('invoices.confirmCancel')}
+  onconfirm={handleCancel}
+  oncancel={() => (cancelTarget = null)}
 />
 
 <InvoiceStatusModal

@@ -85,6 +85,30 @@ export async function generateInvoicePdf(
     GRAY_TEXT,
   );
 
+  // Leistungsdatum / Leistungszeitraum
+  let metaBottomY = y - 38;
+  if (invoice.servicePeriodStart && invoice.servicePeriodEnd) {
+    drawRightAligned(
+      `Leistungszeitraum: ${formatDate(invoice.servicePeriodStart)} - ${formatDate(invoice.servicePeriodEnd)}`,
+      metaX,
+      metaBottomY,
+      helvetica,
+      metaSize,
+      GRAY_TEXT,
+    );
+    metaBottomY -= 14;
+  } else if (invoice.serviceDate) {
+    drawRightAligned(
+      `Leistungsdatum: ${formatDate(invoice.serviceDate)}`,
+      metaX,
+      metaBottomY,
+      helvetica,
+      metaSize,
+      GRAY_TEXT,
+    );
+    metaBottomY -= 14;
+  }
+
   y -= 50;
 
   // Horizontal line
@@ -565,10 +589,17 @@ export async function generateReminderPdf(
   };
 
   const today = new Date().toISOString().split('T')[0];
-  const totalAmount =
+  const netAmount =
     typeof invoice.totalAmount === 'number'
       ? invoice.totalAmount
       : parseFloat(invoice.totalAmount || '0');
+
+  // Calculate gross amount for Regelbesteuerung
+  const taxMode = settings.taxMode ?? 'kleinunternehmer';
+  const taxRate = settings.taxRate ? parseFloat(settings.taxRate) : 19;
+  const isRegelbesteuerung = taxMode === 'regelbesteuerung';
+  const taxAmount = isRegelbesteuerung ? Math.round(netAmount * taxRate) / 100 : 0;
+  const totalAmount = netAmount + taxAmount;
 
   // Determine title and new payment deadline based on level
   const title = reminderLevel <= 1 ? 'ZAHLUNGSERINNERUNG' : 'MAHNUNG';

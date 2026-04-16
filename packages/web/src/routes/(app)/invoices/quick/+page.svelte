@@ -46,6 +46,10 @@
 
   let downloading = $state(false);
   let showMobilePreview = $state(false);
+  let serviceDateMode = $state<'single' | 'range'>('single');
+  let serviceDate = $state(toISODate(new Date()));
+  let servicePeriodStart = $state(toISODate(new Date()));
+  let servicePeriodEnd = $state(toISODate(new Date()));
 
   let totalAmount = $derived(
     billingType === 'hourly'
@@ -95,6 +99,9 @@
     taxRate: settings?.taxRate ?? 19,
     taxId: settings?.taxId || null,
     vatId: settings?.vatId || null,
+    serviceDate: serviceDateMode === 'single' ? serviceDate : undefined,
+    servicePeriodStart: serviceDateMode === 'range' ? servicePeriodStart : undefined,
+    servicePeriodEnd: serviceDateMode === 'range' ? servicePeriodEnd : undefined,
   });
 
   onMount(async () => {
@@ -199,7 +206,10 @@
       <h2 class="text-base font-semibold text-gray-900 mb-4">{t('invoices.details')}</h2>
       <div class="space-y-4">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Input label={t('invoices.invoiceNumber')} bind:value={invoiceNumber} />
+          <div>
+            <Input label={t('invoices.invoiceNumber')} bind:value={invoiceNumber} />
+            <p class="text-xs text-gray-400 mt-1">{t('invoices.invoiceNumberHint')}</p>
+          </div>
           <Input label={t('invoices.date')} type="date" bind:value={invoiceDate} />
           <Input label={t('invoices.paymentDays')} type="number" min="1" bind:value={paymentDays} />
         </div>
@@ -268,6 +278,37 @@
           />
           <span class="text-sm font-medium text-gray-700">{t('invoices.vatNote')}</span>
         </label>
+      </div>
+    </Card>
+
+    <!-- Leistungsdatum -->
+    <Card>
+      <h2 class="text-base font-semibold text-gray-900 mb-4">{t('invoices.serviceDate')}</h2>
+      <div class="space-y-4">
+        <div class="flex gap-2">
+          <button
+            type="button"
+            class="px-4 py-2 text-sm font-medium rounded-lg transition-colors {serviceDateMode === 'single' ? 'bg-accent-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}"
+            onclick={() => (serviceDateMode = 'single')}
+          >
+            {t('invoices.singleDate')}
+          </button>
+          <button
+            type="button"
+            class="px-4 py-2 text-sm font-medium rounded-lg transition-colors {serviceDateMode === 'range' ? 'bg-accent-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}"
+            onclick={() => (serviceDateMode = 'range')}
+          >
+            {t('invoices.dateRange')}
+          </button>
+        </div>
+        {#if serviceDateMode === 'single'}
+          <Input label={t('invoices.serviceDate')} type="date" bind:value={serviceDate} />
+        {:else}
+          <div class="grid grid-cols-2 gap-4">
+            <Input label={t('invoices.serviceDateFrom')} type="date" bind:value={servicePeriodStart} />
+            <Input label={t('invoices.serviceDateTo')} type="date" bind:value={servicePeriodEnd} />
+          </div>
+        {/if}
       </div>
     </Card>
 

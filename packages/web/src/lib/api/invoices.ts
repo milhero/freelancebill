@@ -29,6 +29,12 @@ export async function deleteInvoice(id: string) {
   return fetchApi(`/api/invoices/${id}`, { method: 'DELETE' });
 }
 
+export async function cancelInvoice(id: string) {
+  return fetchApi<ApiResponse<Invoice>>(`/api/invoices/${id}/cancel`, {
+    method: 'POST',
+  });
+}
+
 export async function updateInvoiceStatus(id: string, data: InvoiceStatusChange) {
   return fetchApi<ApiResponse<Invoice>>(`/api/invoices/${id}/status`, {
     method: 'POST',

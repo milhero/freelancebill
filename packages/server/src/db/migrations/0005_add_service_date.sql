@@ -1,0 +1,3 @@
+ALTER TABLE invoices ADD COLUMN IF NOT EXISTS service_date VARCHAR(10);
+ALTER TABLE invoices ADD COLUMN IF NOT EXISTS service_period_start VARCHAR(10);
+ALTER TABLE invoices ADD COLUMN IF NOT EXISTS service_period_end VARCHAR(10);
