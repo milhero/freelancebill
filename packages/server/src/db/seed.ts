@@ -37,7 +37,7 @@ async function seed() {
     iban: 'DE60 2505 0180 1914 7799 91',
     bic: 'SPKHDE2HXXX',
     bankName: 'Sparkasse Hannover',
-    taxFreeAllowance: '11784.00',
+    taxFreeAllowance: '12348.00',
     defaultPaymentDays: 30,
     defaultHourlyRate: '26.00',
     language: 'de',

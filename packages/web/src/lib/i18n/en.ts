@@ -237,7 +237,7 @@ export const en: Translations = {
     legalInvoiceTitle: '§14 UStG — Mandatory Invoice Information',
     legalInvoiceItems: 'Name and address of the supplier,Name and address of the recipient,Tax number or VAT ID,Invoice date,Sequential invoice number,Description of services,Date of service delivery,Net amount / tax rate / tax amount,Gross amount',
     legalRetentionTitle: '§14b UStG — Retention Obligation',
-    legalRetentionText: 'Invoices must be retained for 10 years.',
+    legalRetentionText: 'Invoices must be retained for 8 years (reduced from 10 years since 2025 by the Bureaucracy Relief Act IV).',
   },
   common: {
     loading: 'Loading...',
