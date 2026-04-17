@@ -21,6 +21,7 @@
   let changingPassword = $state(false);
   let passwordError = $state('');
   let legalNotesOpen = $state(false);
+  let settingsTab = $state<'profile' | 'tax' | 'invoice' | 'defaults' | 'appearance' | 'security'>('profile');
 
   const templates = [
     { key: 'standard', name: 'Standard', desc: 'Minimales Design mit dunklem Header' },
@@ -182,6 +183,28 @@
 <PageHeader title={t('settings.title')} />
 
 {#if settings}
+  <!-- Settings Tabs -->
+  <div class="mb-6 flex gap-2 flex-wrap">
+    {#each [
+      { key: 'profile', label: 'Profil & Bank' },
+      { key: 'tax', label: 'Steuern' },
+      { key: 'invoice', label: 'Rechnungsdesign' },
+      { key: 'defaults', label: 'Standardwerte' },
+      { key: 'appearance', label: 'Darstellung' },
+      { key: 'security', label: 'Sicherheit' },
+    ] as tab}
+      <button
+        type="button"
+        class="px-3 py-1.5 text-sm rounded-lg font-medium transition-colors {settingsTab === tab.key ? 'bg-accent-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}"
+        onclick={() => (settingsTab = tab.key)}
+      >
+        {tab.label}
+      </button>
+    {/each}
+  </div>
+
+  <!-- Tab: Profil & Bank -->
+  {#if settingsTab === 'profile'}
   <form onsubmit={handleSubmit} class="max-w-2xl space-y-8">
     <Card>
       <h2 class="text-base font-semibold text-gray-900 mb-4">{t('settings.personalData')}</h2>
@@ -210,7 +233,15 @@
       </div>
     </Card>
 
-    <!-- Tax Settings -->
+    <div class="flex justify-end">
+      <Button type="submit" loading={saving}>{t('settings.save')}</Button>
+    </div>
+  </form>
+  {/if}
+
+  <!-- Tab: Steuern -->
+  {#if settingsTab === 'tax'}
+  <form onsubmit={handleSubmit} class="max-w-2xl space-y-8">
     <Card>
       <h2 class="text-base font-semibold text-gray-900 mb-4">{t('settings.taxSettings')}</h2>
 
@@ -285,6 +316,15 @@
       </div>
     </Card>
 
+    <div class="flex justify-end">
+      <Button type="submit" loading={saving}>{t('settings.save')}</Button>
+    </div>
+  </form>
+  {/if}
+
+  <!-- Tab: Standardwerte -->
+  {#if settingsTab === 'defaults'}
+  <form onsubmit={handleSubmit} class="max-w-2xl space-y-8">
     <Card>
       <h2 class="text-base font-semibold text-gray-900 mb-4">{t('settings.defaults')}</h2>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -294,7 +334,15 @@
       </div>
     </Card>
 
-    <!-- Language Selector -->
+    <div class="flex justify-end">
+      <Button type="submit" loading={saving}>{t('settings.save')}</Button>
+    </div>
+  </form>
+  {/if}
+
+  <!-- Tab: Darstellung -->
+  {#if settingsTab === 'appearance'}
+  <div class="max-w-2xl space-y-8">
     <Card>
       <h2 class="text-base font-semibold text-gray-900 mb-4">{t('settings.language')}</h2>
       <div class="flex gap-2">
@@ -343,7 +391,12 @@
       </div>
     </Card>
 
-    <!-- Invoice Design -->
+  </div>
+  {/if}
+
+  <!-- Tab: Rechnungsdesign -->
+  {#if settingsTab === 'invoice'}
+  <form onsubmit={handleSubmit} class="max-w-3xl space-y-8">
     <Card>
       <h2 class="text-base font-semibold text-gray-900 mb-4">{t('settings.invoiceDesign')}</h2>
 
@@ -483,8 +536,11 @@
       <Button type="submit" loading={saving}>{t('settings.save')}</Button>
     </div>
   </form>
+  {/if}
 
-  <form onsubmit={handlePasswordChange} class="max-w-2xl mt-8">
+  <!-- Tab: Sicherheit -->
+  {#if settingsTab === 'security'}
+  <form onsubmit={handlePasswordChange} class="max-w-2xl">
     <Card>
       <h2 class="text-base font-semibold text-gray-900 mb-4">{t('settings.changePassword')}</h2>
       <div class="grid grid-cols-1 gap-4">
@@ -564,4 +620,5 @@
       {/if}
     </Card>
   </div>
+  {/if}
 {/if}
