@@ -236,6 +236,10 @@ export const de = {
     legalInvoiceItems: 'Name und Anschrift des Leistenden,Name und Anschrift des Leistungsempfängers,Steuernummer oder USt-IdNr.,Rechnungsdatum,Fortlaufende Rechnungsnummer,Leistungsbeschreibung,Leistungsdatum,Nettobetrag / Steuersatz / Steuerbetrag,Bruttobetrag',
     legalRetentionTitle: '§14b UStG — Aufbewahrungspflicht',
     legalRetentionText: 'Rechnungen müssen 8 Jahre aufbewahrt werden (seit 2025 verkürzt durch das Bürokratieentlastungsgesetz IV).',
+    backupInfo: 'Das Backup enthält alle Daten, Rechnungs-PDFs und Belege als ZIP-Datei.',
+    backupFrequency: 'Empfehlung: Mindestens monatlich ein Backup erstellen.',
+    backupReminder: 'Erinnerung: Erstelle regelmäßig Backups deiner Daten. ',
+    backupNow: 'Jetzt Backup erstellen',
   },
   common: {
     loading: 'Laden...',

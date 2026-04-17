@@ -132,18 +132,22 @@
   async function handleBackupDownload() {
     downloadingBackup = true;
     try {
-      const backup = await fetchApi<any>('/api/backup');
-      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+      const response = await fetch('/api/backup', {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+      });
+      if (!response.ok) throw new Error('Backup download failed');
+      const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       const date = new Date().toISOString().split('T')[0];
       a.href = url;
-      a.download = `freelancebill-backup-${date}.json`;
+      a.download = `freelancebill-backup-${date}.zip`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      showToast(t('common.success'), 'success');
+      localStorage.setItem('freelancebill-last-backup', Date.now().toString());
+      showToast(t('settings.backupSuccess'), 'success');
     } catch {
       showToast(t('common.error'), 'error');
     } finally {
@@ -154,20 +158,21 @@
   async function handleBackupRestore() {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = '.json';
+    input.accept = '.zip';
     input.onchange = async () => {
       const file = input.files?.[0];
       if (!file) return;
       restoringBackup = true;
       try {
-        const text = await file.text();
-        const backup = JSON.parse(text);
-        await fetchApi('/api/backup/restore', {
+        const formData = new FormData();
+        formData.append('file', file);
+        const response = await fetch('/api/backup/restore', {
           method: 'POST',
-          body: JSON.stringify(backup),
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+          body: formData,
         });
+        if (!response.ok) throw new Error('Restore failed');
         showToast(t('settings.backupSuccess'), 'success');
-        // Reload settings after restore
         const res = await getSettings();
         settings = res.data;
       } catch {
@@ -560,7 +565,9 @@
   <div class="max-w-2xl mt-8">
     <Card>
       <h2 class="text-base font-semibold text-gray-900 dark:text-gray-100 mb-4">{t('settings.backup')}</h2>
-      <p class="text-sm text-amber-600 dark:text-amber-400 mb-4">{t('settings.backupWarning')}</p>
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{t('settings.backupInfo')}</p>
+      <p class="text-sm text-amber-600 dark:text-amber-400 mb-2">{t('settings.backupWarning')}</p>
+      <p class="text-xs text-gray-500 dark:text-gray-500 mb-4">{t('settings.backupFrequency')}</p>
       <div class="flex gap-3">
         <Button onclick={handleBackupDownload} loading={downloadingBackup}>{t('settings.backupDownload')}</Button>
         <Button onclick={handleBackupRestore} loading={restoringBackup}>{t('settings.backupRestore')}</Button>
