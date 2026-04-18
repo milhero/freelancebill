@@ -7,18 +7,30 @@
   import PageHeader from '$lib/components/layout/PageHeader.svelte';
   import Card from '$lib/components/ui/Card.svelte';
   import Badge from '$lib/components/ui/Badge.svelte';
+  import LoadingSpinner from '$lib/components/ui/LoadingSpinner.svelte';
 
   let data = $state<DashboardData | null>(null);
+  let loading = $state(true);
 
   onMount(async () => {
-    const res = await getDashboard();
-    data = res.data;
+    try {
+      const res = await getDashboard();
+      data = res.data;
+    } catch {
+      // data stays null, loading state ends
+    } finally {
+      loading = false;
+    }
   });
 </script>
 
 <PageHeader title={t('dashboard.title')} />
 
-{#if data}
+{#if loading}
+  <div class="flex justify-center py-12">
+    <LoadingSpinner />
+  </div>
+{:else if data}
   <!-- KPI Cards -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
     <Card>

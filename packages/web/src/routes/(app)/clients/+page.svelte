@@ -14,12 +14,24 @@
   let clients = $state<Client[]>([]);
   let search = $state('');
   let deleteTarget = $state<Client | null>(null);
+  let loading = $state(true);
+  let debounceTimer: ReturnType<typeof setTimeout> | undefined;
 
   onMount(loadClients);
 
   async function loadClients() {
-    const res = await getClients(search || undefined);
-    clients = res.data;
+    loading = true;
+    try {
+      const res = await getClients(search || undefined);
+      clients = res.data;
+    } finally {
+      loading = false;
+    }
+  }
+
+  function debouncedSearch() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(loadClients, 300);
   }
 
   async function handleDelete() {
@@ -42,7 +54,7 @@
 </PageHeader>
 
 <div class="mb-6 max-w-sm">
-  <Input placeholder={t('common.search')} bind:value={search} oninput={loadClients} />
+  <Input placeholder={t('common.search')} bind:value={search} oninput={debouncedSearch} />
 </div>
 
 {#if clients.length === 0}

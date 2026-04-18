@@ -2,17 +2,7 @@ import { eq, and, ilike } from 'drizzle-orm';
 import { db } from '../db/index.js';
 import { clients } from '../db/schema/clients.js';
 import { NotFoundError } from '../utils/errors.js';
-
-type ClientCreate = {
-  name: string;
-  addressStreet?: string | null;
-  addressZip?: string | null;
-  addressCity?: string | null;
-  contactPerson?: string | null;
-  email?: string | null;
-  phone?: string | null;
-  notes?: string | null;
-};
+import type { ClientCreate } from '@freelancebill/shared';
 
 export async function getClients(userId: string, search?: string) {
   const query = db

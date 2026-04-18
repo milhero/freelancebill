@@ -14,21 +14,30 @@
   let debounceTimer: ReturnType<typeof setTimeout>;
   let pdfjsLib: any = null;
 
-  onMount(async () => {
+  onMount(() => {
+    let observer: ResizeObserver | undefined;
+
     // Measure container
     if (containerEl) {
       containerWidth = containerEl.clientWidth;
-      const observer = new ResizeObserver((entries) => {
+      observer = new ResizeObserver((entries) => {
         containerWidth = entries[0].contentRect.width;
       });
       observer.observe(containerEl);
     }
 
     // Load pdf.js
-    const pdfjs = await import('pdfjs-dist');
-    pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
-    pdfjsLib = pdfjs;
-    ready = true;
+    import('pdfjs-dist').then((pdfjs) => {
+      pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
+      pdfjsLib = pdfjs;
+      ready = true;
+    });
+
+    // Cleanup on unmount
+    return () => {
+      observer?.disconnect();
+      clearTimeout(debounceTimer);
+    };
   });
 
   // Re-render when formData changes AND pdf.js is ready

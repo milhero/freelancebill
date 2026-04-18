@@ -124,6 +124,10 @@ export const en: Translations = {
     cancelledSuccess: 'Invoice cancelled',
     taxIdWarning: 'No tax ID set. Please add it in settings.',
     invoiceNumberHint: 'Note: The number must fit into the sequential numbering.',
+    markAsPaid: 'Mark as paid',
+    paidToday: 'Paid today',
+    chooseOtherDate: 'Choose a different date...',
+    paymentReceivedDate: 'Payment received date',
   },
   expenses: {
     title: 'Expenses',
@@ -132,6 +136,9 @@ export const en: Translations = {
     description: 'Description',
     amount: 'Amount',
     paymentMethod: 'Payment Method',
+    paymentMethodSelect: 'Select payment method',
+    paymentMethodOther: 'Other...',
+    paymentMethodCustom: 'Back to selection',
     tags: 'Tags',
     notes: 'Notes',
     create: 'Create',
@@ -241,6 +248,7 @@ export const en: Translations = {
     backupInfo: 'The backup contains all data, invoice PDFs and receipts as a ZIP file.',
     backupFrequency: 'Recommendation: Create a backup at least once a month.',
     backupReminder: 'Reminder: Create regular backups of your data. ',
+    backupReminderPopup: 'Your last backup is more than 30 days old. Back up your data now.',
     backupNow: 'Create backup now',
   },
   common: {

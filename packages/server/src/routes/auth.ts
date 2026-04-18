@@ -8,6 +8,30 @@ import { db } from '../db/index.js';
 import { users } from '../db/schema/users.js';
 import { verifyPassword, hashPassword } from '../utils/password.js';
 
+// Simple in-memory rate limiter for login attempts
+const loginAttempts = new Map<string, { count: number; resetAt: number }>();
+const MAX_ATTEMPTS = 5;
+const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const record = loginAttempts.get(ip);
+  if (!record || now > record.resetAt) {
+    loginAttempts.set(ip, { count: 1, resetAt: now + WINDOW_MS });
+    return true;
+  }
+  record.count++;
+  return record.count <= MAX_ATTEMPTS;
+}
+
+// Cleanup old entries periodically
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, record] of loginAttempts) {
+    if (now > record.resetAt) loginAttempts.delete(ip);
+  }
+}, 60 * 1000);
+
 const loginSchema = {
   body: Type.Object({
     email: Type.String({ minLength: 1 }),
@@ -17,6 +41,11 @@ const loginSchema = {
 
 export async function authRoutes(app: FastifyInstance) {
   app.post('/api/auth/login', { schema: loginSchema }, async (request, reply) => {
+    const clientIp = request.ip;
+    if (!checkRateLimit(clientIp)) {
+      return reply.status(429).send({ error: 'Too many login attempts. Please try again later.', statusCode: 429 });
+    }
+
     const { email, password } = request.body as { email: string; password: string };
 
     try {
@@ -75,6 +104,6 @@ export async function authRoutes(app: FastifyInstance) {
     const hash = await hashPassword(newPassword);
     await db.update(users).set({ passwordHash: hash }).where(eq(users.id, userId));
 
-    return { data: { success: true } };
+    return reply.send({ data: { success: true } });
   });
 }

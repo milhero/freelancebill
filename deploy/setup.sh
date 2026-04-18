@@ -23,8 +23,13 @@ npm install -g pm2
 apt install -y postgresql postgresql-contrib
 
 # Configure PostgreSQL
-sudo -u postgres psql -c "CREATE USER freelancebill WITH PASSWORD 'CHANGE_THIS_PASSWORD';"
+# Generate a random password for the database user
+DB_PASSWORD=$(openssl rand -base64 24)
+sudo -u postgres psql -c "CREATE USER freelancebill WITH PASSWORD '${DB_PASSWORD}';"
 sudo -u postgres psql -c "CREATE DATABASE freelancebill OWNER freelancebill;"
+echo ""
+echo "Database password (save this!): ${DB_PASSWORD}"
+echo "DATABASE_URL=postgresql://freelancebill:${DB_PASSWORD}@localhost:5432/freelancebill"
 
 # Install Nginx
 apt install -y nginx

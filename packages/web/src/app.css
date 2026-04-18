@@ -41,10 +41,41 @@
   --color-danger-600: #dc2626;
   --color-danger-700: #b91c1c;
 
+  --color-warning-100: #fef3c7;
+  --color-success-100: #dcfce7;
+  --color-danger-100: #fee2e2;
+
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
+
+  /* Semantic design tokens */
+  --color-bg-primary: var(--color-gray-50);
+  --color-bg-secondary: #ffffff;
+  --color-bg-tertiary: var(--color-gray-100);
+  --color-text-primary: var(--color-gray-900);
+  --color-text-secondary: var(--color-gray-600);
+  --color-text-muted: var(--color-gray-400);
+  --color-border: var(--color-gray-200);
+  --color-border-hover: var(--color-gray-300);
+
+  /* Spacing scale */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 200ms ease;
 }
 
 /* Dark mode: invert gray scale so existing classes automatically work */
@@ -65,8 +96,24 @@
   --color-accent-100: #312e81;
 
   --color-success-50: #052e16;
+  --color-success-100: #064e3b;
   --color-warning-50: #451a03;
+  --color-warning-100: #78350f;
   --color-danger-50: #450a0a;
+  --color-danger-100: #7f1d1d;
+
+  --color-bg-primary: var(--color-gray-50);
+  --color-bg-secondary: var(--color-gray-100);
+  --color-bg-tertiary: var(--color-gray-200);
+  --color-text-primary: var(--color-gray-900);
+  --color-text-secondary: var(--color-gray-600);
+  --color-text-muted: var(--color-gray-400);
+  --color-border: var(--color-gray-200);
+  --color-border-hover: var(--color-gray-300);
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
 
   color-scheme: dark;
 }

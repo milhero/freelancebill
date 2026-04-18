@@ -2,15 +2,7 @@ import { eq, and, desc } from 'drizzle-orm';
 import { db } from '../db/index.js';
 import { projects } from '../db/schema/projects.js';
 import { NotFoundError } from '../utils/errors.js';
-
-type ProjectCreate = {
-  name: string;
-  clientId?: string | null;
-  status?: 'active' | 'completed';
-  startDate?: string | null;
-  endDate?: string | null;
-  notes?: string | null;
-};
+import type { ProjectCreate } from '@freelancebill/shared';
 
 export async function getProjects(userId: string, clientId?: string, status?: string) {
   const conditions = [eq(projects.userId, userId)];
