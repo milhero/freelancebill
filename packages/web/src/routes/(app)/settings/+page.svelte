@@ -133,7 +133,7 @@
     downloadingBackup = true;
     try {
       const response = await fetch('/api/backup', {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+        credentials: 'include',
       });
       if (!response.ok) throw new Error('Backup download failed');
       const blob = await response.blob();
@@ -168,7 +168,7 @@
         formData.append('file', file);
         const response = await fetch('/api/backup/restore', {
           method: 'POST',
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+          credentials: 'include',
           body: formData,
         });
         if (!response.ok) throw new Error('Restore failed');

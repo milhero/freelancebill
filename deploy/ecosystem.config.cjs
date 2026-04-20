@@ -3,6 +3,7 @@ module.exports = {
     name: 'freelancebill-api',
     script: 'packages/server/dist/index.js',
     cwd: '/var/www/freelancebill',
+    user: 'freelancebill',
     env: {
       NODE_ENV: 'production',
       PORT: 3000,

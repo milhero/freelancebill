@@ -80,17 +80,16 @@ export async function authRoutes(app: FastifyInstance) {
   });
 
   // Change password
-  app.put('/api/auth/password', { preHandler: [requireAuth] }, async (request, reply) => {
+  const changePasswordSchema = {
+    body: Type.Object({
+      currentPassword: Type.String({ minLength: 1 }),
+      newPassword: Type.String({ minLength: 8 }),
+    }),
+  };
+
+  app.put('/api/auth/password', { schema: changePasswordSchema, preHandler: [requireAuth] }, async (request, reply) => {
     const { currentPassword, newPassword } = request.body as { currentPassword: string; newPassword: string };
     const userId = request.userId;
-
-    if (!currentPassword || !newPassword) {
-      return reply.status(400).send({ error: 'Both passwords required' });
-    }
-
-    if (newPassword.length < 8) {
-      return reply.status(400).send({ error: 'Password must be at least 8 characters' });
-    }
 
     // Get current user
     const [user] = await db.select().from(users).where(eq(users.id, userId));
