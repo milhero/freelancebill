@@ -22,13 +22,35 @@ Self-hosted business tracker for German freelancers and small businesses.
 - **i18n** — German and English
 - **PWA** — Installable on mobile and desktop
 
-## Prerequisites
+## Quick Start (Docker)
 
-- **Node.js** >= 20
-- **pnpm** >= 9
-- **PostgreSQL** >= 15
+The easiest way to run FreelanceBill. Requires only [Docker](https://docs.docker.com/get-docker/).
 
-## Quick Start
+```bash
+git clone https://github.com/milhero/freelancebill.git
+cd freelancebill
+docker compose up -d
+```
+
+Open [http://localhost](http://localhost) — done.
+
+**Default login:** `admin@example.com` / `changeme123`
+
+Demo data (clients, invoices, expenses) is created automatically on first start.
+
+For production, create a `.env` file:
+```bash
+DB_PASSWORD=your-secure-db-password
+SESSION_SECRET=$(openssl rand -hex 32)
+CORS_ORIGIN=https://yourdomain.com
+PORT=80
+```
+
+## Manual Setup
+
+Prerequisites: **Node.js** >= 20, **pnpm** >= 9, **PostgreSQL** >= 15
+
+### Quick Start
 
 ```bash
 # 1. Clone & install
@@ -103,6 +125,16 @@ freelancebill/
 
 ## Deployment
 
+### Docker (Recommended)
+
+```bash
+docker compose up -d
+```
+
+Add a reverse proxy (Caddy, Traefik, nginx) in front for HTTPS.
+
+### Manual VPS
+
 Production config in `deploy/`:
 
 - `nginx.conf` — Reverse proxy with SSL, security headers, TLS 1.2+
@@ -110,11 +142,6 @@ Production config in `deploy/`:
 - `setup.sh` — VPS provisioning (Node.js, PostgreSQL, Nginx, Certbot)
 
 Update `server_name` in `nginx.conf` to your domain before deploying.
-
-```bash
-chmod +x deploy/setup.sh
-./deploy/setup.sh
-```
 
 ## Legal Compliance (Germany)
 
