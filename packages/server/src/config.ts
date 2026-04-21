@@ -18,6 +18,11 @@ if (isProduction) {
   }
 
   // Reject known default/weak values
+  const knownDefaults = ['dev-secret-change-in-production', 'change-me-to-a-random-64-char-string-in-production'];
+  if (knownDefaults.includes(sessionSecret)) {
+    throw new Error('SESSION_SECRET is set to a known default value. Generate a secure secret: openssl rand -hex 32');
+  }
+
   if (process.env.CORS_ORIGIN === '*') {
     throw new Error('CORS_ORIGIN must not be * in production');
   }

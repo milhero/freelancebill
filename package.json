@@ -1,5 +1,27 @@
 {
   "name": "freelancebill",
+  "description": "Self-hosted business tracker for German freelancers and small businesses",
+  "author": "Milan Ronnenberg",
+  "license": "CC-BY-NC-4.0",
+  "homepage": "https://github.com/milhero/freelancebill",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/milhero/freelancebill.git"
+  },
+  "bugs": {
+    "url": "https://github.com/milhero/freelancebill/issues"
+  },
+  "keywords": [
+    "invoicing",
+    "finance",
+    "freelancer",
+    "self-hosted",
+    "german",
+    "tax",
+    "kleinunternehmer",
+    "rechnung",
+    "buchhaltung"
+  ],
   "private": true,
   "type": "module",
   "scripts": {
