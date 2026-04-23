@@ -1,0 +1,57 @@
+# FreelanceBill — Production Docker Compose (Pre-built Images)
+#
+# Usage:
+#   curl -LO https://github.com/milhero/freelancebill/releases/latest/download/docker-compose.prod.yml
+#   docker compose -f docker-compose.prod.yml up -d
+#
+# Open http://localhost — Default login: admin@example.com / changeme123
+#
+# For production, create a .env file next to this file:
+#   DB_PASSWORD=your-secure-db-password
+#   SESSION_SECRET=$(openssl rand -hex 32)
+#   CORS_ORIGIN=https://yourdomain.com
+#   PORT=80
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: freelancebill
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-freelancebill_secret}
+      POSTGRES_DB: freelancebill
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U freelancebill"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  server:
+    image: ghcr.io/milhero/freelancebill-server:latest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://freelancebill:${DB_PASSWORD:-freelancebill_secret}@db:5432/freelancebill
+      SESSION_SECRET: ${SESSION_SECRET:-change-me-to-a-random-64-char-string-in-production}
+      NODE_ENV: production
+      PORT: "3000"
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost}
+      UPLOAD_DIR: ./uploads
+    volumes:
+      - uploads:/app/uploads
+
+  web:
+    image: ghcr.io/milhero/freelancebill-web:latest
+    restart: unless-stopped
+    ports:
+      - "${PORT:-80}:80"
+    depends_on:
+      - server
+
+volumes:
+  postgres_data:
+  uploads:

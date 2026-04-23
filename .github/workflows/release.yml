@@ -1,0 +1,90 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push server image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: server
+          push: true
+          tags: |
+            ghcr.io/milhero/freelancebill-server:${{ steps.version.outputs.VERSION }}
+            ghcr.io/milhero/freelancebill-server:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          labels: |
+            org.opencontainers.image.source=https://github.com/milhero/freelancebill
+            org.opencontainers.image.description=FreelanceBill API Server
+            org.opencontainers.image.licenses=CC-BY-NC-4.0
+
+      - name: Build and push web image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: nginx
+          push: true
+          tags: |
+            ghcr.io/milhero/freelancebill-web:${{ steps.version.outputs.VERSION }}
+            ghcr.io/milhero/freelancebill-web:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          labels: |
+            org.opencontainers.image.source=https://github.com/milhero/freelancebill
+            org.opencontainers.image.description=FreelanceBill Web Frontend
+            org.opencontainers.image.licenses=CC-BY-NC-4.0
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          body: |
+            ## Quick Start
+
+            ```bash
+            # Download and start
+            curl -LO https://github.com/milhero/freelancebill/releases/latest/download/docker-compose.prod.yml
+            docker compose -f docker-compose.prod.yml up -d
+            ```
+
+            Open [http://localhost](http://localhost) — Login: `admin@example.com` / `changeme123`
+
+            ## Docker Images
+
+            ```
+            ghcr.io/milhero/freelancebill-server:${{ steps.version.outputs.VERSION }}
+            ghcr.io/milhero/freelancebill-web:${{ steps.version.outputs.VERSION }}
+            ```
+
+            See the [README](https://github.com/milhero/freelancebill#quick-start) for production configuration.
+          files: |
+            docker-compose.prod.yml
+            .env.example
