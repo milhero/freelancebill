@@ -29,12 +29,14 @@ async function fetchApi<T>(path: string, options: FetchOptions = {}): Promise<T>
     if (qs) url += `?${qs}`;
   }
 
+  const headers: Record<string, string> = { ...init.headers as Record<string, string> };
+  if (init.body) {
+    headers['Content-Type'] = 'application/json';
+  }
+
   const response = await fetch(url, {
     credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      ...init.headers,
-    },
+    headers,
     ...init,
   });
 
