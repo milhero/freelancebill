@@ -1,6 +1,6 @@
 # FreelanceBill
 
-Self-hosted business tracker for German freelancers and small businesses.
+Self-hosted invoicing and finance tool for German freelancers and small businesses.
 
 ![GitHub Release](https://img.shields.io/github/v/release/milhero/freelancebill?style=flat&label=release)
 ![License](https://img.shields.io/badge/license-CC%20BY--NC%204.0-blue.svg)

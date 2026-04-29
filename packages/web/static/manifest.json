@@ -1,7 +1,7 @@
 {
   "name": "FreelanceBill",
   "short_name": "FreelanceBill",
-  "description": "Business Tracker fuer Freelancer",
+  "description": "Rechnungen und Finanzen für Freelancer",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
